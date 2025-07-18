@@ -1,0 +1,56 @@
+# Generic ignores
+.DS_Store
+.env
+.vscode/
+.idea/
+*.iml
+*.ipr
+*.iws
+*.log
+*.bak
+*.swp
+*~
+*.swo
+
+# Java/Kotlin specific ignores (for minecraft-mod)
+/build/
+.gradle/
+*.jar
+*.war
+*.ear
+*.zip
+*.tar.gz
+*.log
+!/gradle/wrapper/gradle-wrapper.jar
+
+# C# specific ignores (for streamdeck-plugin)
+[Bb]in/
+[Oo]bj/
+*.user
+*.suo
+*.csproj.user
+*.vspscc
+*.vssscc
+*.buildscc
+*.bak
+*.nupkg
+*.resharper
+*.DotSettings
+*.pid
+*.pdb
+*.dll
+*.exe
+*.cache
+*.tmp
+*.userprefs
+
+# StreamDeck Plugin specific ignores
+streamdeck-plugin/bin/
+streamdeck-plugin/obj/
+
+# Minecraft Mod specific ignores
+minecraft-mod/build/
+minecraft-mod/.gradle/
+minecraft-mod/*.jar
+minecraft-mod/*.zip
+minecraft-mod/*.log
