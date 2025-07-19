@@ -59,12 +59,6 @@ craftdeck-mod/.gradle/
 craftdeck-mod/run/
 !craftdeck-mod/gradle/wrapper/gradle-wrapper.jar
 
-# Wiki repository (separate git repo)
-wiki/
-
-# Claude Code local settings
-.claude/settings.local.json
-
 # IDEs
 .idea/
 .vscode/
