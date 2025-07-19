@@ -38,7 +38,7 @@ repositories {
 }
 
 dependencies {
-    forge("net.minecraftforge:forge:${rootProject.property("forge_version")}")
+    forge("net.minecraftforge:forge:${rootProject.property("minecraft_version")}-${rootProject.property("forge_version")}")
     // Remove the next line if you don't want to depend on the API
     modApi("dev.architectury:architectury-forge:${rootProject.property("architectury_version")}")
 

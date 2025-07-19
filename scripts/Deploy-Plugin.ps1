@@ -110,8 +110,8 @@ function Build-StreamDeckPlugin {
 
         # Copy localization files
         $publishDir = "bin\$Configuration\net6.0\$($Config.Runtime)\publish"
-        Copy-Item "en.json" $publishDir -Force
-        Copy-Item "ja.json" $publishDir -Force
+        Copy-Item "locales\en.json" $publishDir -Force
+        Copy-Item "locales\ja.json" $publishDir -Force
 
         Write-Host "✅ StreamDeck Plugin built successfully" -ForegroundColor Green
         return $true
@@ -268,11 +268,12 @@ function Main {
         Write-Host "1. Open StreamDeck application" -ForegroundColor Gray
         Write-Host "2. Add CraftDeck actions to your Stream Deck" -ForegroundColor Gray
         Write-Host "3. Configure WebSocket connection (default: ws://localhost:8080)" -ForegroundColor Gray
-
+        Write-Host "`nPress any key to continue..." -ForegroundColor Cyan
         Read-Host
         exit 0
     } else {
         Write-Host "💥 Plugin deployment failed!" -ForegroundColor Red
+        Write-Host "`nPress any key to continue..." -ForegroundColor Cyan
         Read-Host
         exit 1
     }

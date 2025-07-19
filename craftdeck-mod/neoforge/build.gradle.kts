@@ -8,12 +8,12 @@ architectury {
 }
 
 loom {
-    accessWidenerPath.set(project(":common").loom.accessWidenerPath)
+    // accessWidenerPath.set(project(":common").loom.accessWidenerPath)
 
-    neoForge {
-        convertAccessWideners.set(true)
-        extraAccessWideners.add(loom.accessWidenerPath.get().asFile.name)
-    }
+    // neoForge {
+    //     convertAccessWideners.set(true)
+    //     extraAccessWideners.add(loom.accessWidenerPath.get().asFile.name)
+    // }
 }
 
 val common: Configuration by configurations.creating
@@ -27,7 +27,9 @@ configurations {
 }
 
 dependencies {
-    neoForge("net.neoforged:neoforge:${rootProject.property("neoforge_version")}")
+    "minecraft"("com.mojang:minecraft:${rootProject.property("minecraft_version")}")
+    "mappings"(loom.officialMojangMappings())
+    "neoforge"("net.neoforged:neoforge:${rootProject.property("neoforge_version")}")
 
     modApi("dev.architectury:architectury-neoforge:${rootProject.property("architectury_version")}")
 
