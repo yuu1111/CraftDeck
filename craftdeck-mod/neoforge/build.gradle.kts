@@ -26,10 +26,20 @@ configurations {
     developmentNeoForge.extendsFrom(common)
 }
 
+repositories {
+    // NeoForge
+    maven {
+        name = "NeoForged"
+        url = uri("https://maven.neoforged.net/releases/")
+    }
+}
+
 dependencies {
     "minecraft"("com.mojang:minecraft:${rootProject.property("minecraft_version")}")
     "mappings"(loom.officialMojangMappings())
-    "neoforge"("net.neoforged:neoforge:${rootProject.property("neoforge_version")}")
+    
+    // NeoForge dependency using correct configuration
+    neoForge("net.neoforged:neoforge:${rootProject.property("neoforge_version")}")
 
     modApi("dev.architectury:architectury-neoforge:${rootProject.property("architectury_version")}")
 
