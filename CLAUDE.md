@@ -18,7 +18,10 @@ The two components communicate via WebSocket using JSON protocol on port 8080 (c
 # Navigate to craftdeck-mod directory
 cd craftdeck-mod
 
-# Build all mod variants
+# Build all mod variants using PowerShell Core (pwsh) script (recommended)
+pwsh -ExecutionPolicy Bypass -File "../scripts/Build-Mod.ps1"
+
+# Or build directly with Gradle
 ./gradlew build
 
 # Run specific platform development
@@ -32,6 +35,8 @@ cd craftdeck-mod
 # Generate sources JAR
 ./gradlew sourcesJar
 ```
+
+**Note**: Use PowerShell Core (pwsh) instead of Windows PowerShell for cross-platform compatibility. The build script automatically detects and allows selection of Java environments when multiple versions are installed.
 
 ### StreamDeck Plugin (C#/.NET)
 ```bash

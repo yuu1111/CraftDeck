@@ -16,11 +16,11 @@ MinecraftとElgato Stream Deckをリアルタイムで接続し、Stream Deckデ
 - **マルチプラットフォーム対応**: Fabric、Forge、Quilt mod loaderに対応
 - **カスタマイズ可能インターフェース**: 各Stream Deckキーに表示する情報を設定可能
 - **低遅延**: WebSocketベースの通信で瞬時に更新
-- **簡単セットアップ**: MinecraftモッドとStream Deckプラグインの簡単インストール
+- **簡単セットアップ**: Minecraft ModとStream Deckプラグインの簡単インストール
 
 ## 📋 必要要件
 
-### Minecraft モッド
+### Minecraft Mod
 - Minecraft 1.19.2 以降
 - Java 17 以降
 - 以下のいずれかのmod loader:
@@ -36,12 +36,12 @@ MinecraftとElgato Stream Deckをリアルタイムで接続し、Stream Deckデ
 
 ## 🚀 インストール
 
-### Minecraft モッド インストール
+### Minecraft Mod インストール
 
 1. **mod JARファイルをダウンロード** [リリース](../../releases)から対応するmod loader用ファイルを取得
 2. **mod loaderをインストール** (Fabric/Forge/Quilt) 未インストールの場合
 3. **JARファイルを配置** `mods`フォルダに配置
-4. **Minecraftを起動** - モッドが自動的にWebSocketサーバーをポート8080で開始
+4. **Minecraftを起動** - Modが自動的にWebSocketサーバーをポート8080で開始
 
 ### Stream Deck プラグイン インストール
 
@@ -52,8 +52,8 @@ MinecraftとElgato Stream Deckをリアルタイムで接続し、Stream Deckデ
 
 ## 🔧 設定
 
-### Minecraft モッド設定
-モッドは設定ファイルを `config/craftdeck.json` に作成します:
+### Minecraft Mod設定
+Modは設定ファイルを `config/craftdeck.json` に作成します:
 
 ```json
 {
@@ -76,7 +76,7 @@ MinecraftとElgato Stream Deckをリアルタイムで接続し、Stream Deckデ
 
 CraftDeckはJSONメッセージを使用したWebSocket通信を使用:
 
-### ゲームデータメッセージ (モッド → プラグイン)
+### ゲームデータメッセージ (モMod → プラグイン)
 ```json
 {
   "type": "player_status",
@@ -96,7 +96,7 @@ CraftDeckはJSONメッセージを使用したWebSocket通信を使用:
 }
 ```
 
-### コマンドメッセージ (プラグイン → モッド)
+### コマンドメッセージ (プラグイン → Mod)
 ```json
 {
   "type": "execute_command",
@@ -111,7 +111,7 @@ CraftDeckはJSONメッセージを使用したWebSocket通信を使用:
 
 ### ソースからビルド
 
-#### Minecraft モッド
+#### Minecraft Mod
 ```bash
 cd craftdeck-mod
 ./gradlew build

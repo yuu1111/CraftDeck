@@ -21,7 +21,10 @@
       "Bash(rg:*)",
       "WebFetch(domain:docs.elgato.com)",
       "Bash(dotnet publish:*)",
-      "Bash(find:*)"
+      "Bash(find:*)",
+      "Bash(cmd:*)",
+      "Bash(wsl:*)",
+      "Bash(java:*)"
     ],
     "deny": []
   }

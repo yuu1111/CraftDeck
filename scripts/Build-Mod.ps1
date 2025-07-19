@@ -1,4 +1,5 @@
 #!/usr/bin/env pwsh
+# PowerShell Core (pwsh) required for cross-platform compatibility
 <#
 .SYNOPSIS
     CraftDeck Minecraft Mod Build Script
@@ -53,18 +54,113 @@ if ($RunClient) { Write-Host "Run Client: Yes" -ForegroundColor Gray }
 if ($DetailedLog) { Write-Host "Detailed Log: Yes" -ForegroundColor Gray }
 Write-Host ""
 
+# Select Java environment
+function Select-JavaEnvironment {
+    Write-Host "🔍 Detecting Java installations..." -ForegroundColor Cyan
+    
+    $javaInstalls = @()
+    
+    # Check PATH first
+    try {
+        $pathJava = Get-Command java -ErrorAction SilentlyContinue
+        if ($pathJava) {
+            $version = & java -version 2>&1 | Select-Object -First 1
+            if ($version -match 'version "(\d+)') {
+                $majorVersion = [int]$matches[1]
+                $javaInstalls += @{
+                    Path = Split-Path $pathJava.Source
+                    Executable = $pathJava.Source
+                    Version = $version.Trim()
+                    MajorVersion = $majorVersion
+                }
+            }
+        }
+    } catch {
+        # Continue with directory search
+    }
+    
+    # Search common Java installation paths
+    $searchPaths = @(
+        "C:\Program Files\Zulu\*\bin\java.exe",
+        "C:\Program Files\Microsoft\*\bin\java.exe", 
+        "C:\Program Files\Java\*\bin\java.exe",
+        "C:\Program Files\Eclipse Adoptium\*\bin\java.exe",
+        "C:\Program Files\OpenJDK\*\bin\java.exe",
+        "C:\Program Files (x86)\Java\*\bin\java.exe"
+    )
+    
+    foreach ($path in $searchPaths) {
+        $found = Get-ChildItem -Path $path -ErrorAction SilentlyContinue
+        foreach ($java in $found) {
+            try {
+                $version = & $java.FullName -version 2>&1 | Select-Object -First 1
+                if ($version -match 'version "(\d+)') {
+                    $majorVersion = [int]$matches[1]
+                    $javaInstalls += @{
+                        Path = $java.DirectoryName
+                        Executable = $java.FullName
+                        Version = $version.Trim()
+                        MajorVersion = $majorVersion
+                    }
+                }
+            } catch {
+                # Skip invalid Java installations
+            }
+        }
+    }
+    
+    # Remove duplicates and sort by version
+    $javaInstalls = $javaInstalls | Sort-Object @{Expression={$_.MajorVersion}; Descending=$true} | Group-Object Path | ForEach-Object { $_.Group[0] }
+    
+    if ($javaInstalls.Count -eq 0) {
+        Write-Host "❌ No Java installations found" -ForegroundColor Red
+        return $null
+    }
+    
+    if ($javaInstalls.Count -eq 1) {
+        $selectedJava = $javaInstalls[0]
+        Write-Host "   ✅ Found Java: $($selectedJava.Version)" -ForegroundColor Gray
+        return $selectedJava
+    }
+    
+    # Multiple Java installations found - let user choose
+    Write-Host "`n📋 Multiple Java installations detected:" -ForegroundColor Yellow
+    for ($i = 0; $i -lt $javaInstalls.Count; $i++) {
+        $java = $javaInstalls[$i]
+        Write-Host "   [$($i + 1)] $($java.Version)" -ForegroundColor Gray
+        Write-Host "       Path: $($java.Path)" -ForegroundColor DarkGray
+    }
+    
+    do {
+        Write-Host "`nJava環境を選択してください (1-$($javaInstalls.Count)): " -ForegroundColor Cyan -NoNewline
+        $selection = Read-Host
+        
+        if ($selection -match '^\d+$') {
+            $index = [int]$selection - 1
+            if ($index -ge 0 -and $index -lt $javaInstalls.Count) {
+                $selectedJava = $javaInstalls[$index]
+                Write-Host "   ✅ Selected: $($selectedJava.Version)" -ForegroundColor Green
+                return $selectedJava
+            }
+        }
+        Write-Host "   ❌ 無効な選択です。1-$($javaInstalls.Count)の範囲で入力してください。" -ForegroundColor Red
+    } while ($true)
+}
+
 # Validate environment
 function Test-BuildEnvironment {
     Write-Host "🔍 Validating build environment..." -ForegroundColor Cyan
 
     $issues = @()
 
-    # Check Java
-    try {
-        $javaVersion = java -version 2>&1 | Select-Object -First 1
-        Write-Host "   ✅ Java: $javaVersion" -ForegroundColor Gray
-    } catch {
+    # Select and set Java environment
+    $selectedJava = Select-JavaEnvironment
+    if (-not $selectedJava) {
         $issues += "❌ Java not found (required for Minecraft mod build)"
+    } else {
+        $env:JAVA_HOME = $selectedJava.Path.Replace('\bin', '')
+        $env:PATH = "$($selectedJava.Path);$env:PATH"
+        Write-Host "   ✅ JAVA_HOME set to: $env:JAVA_HOME" -ForegroundColor Gray
     }
 
     # Check mod directory
@@ -74,10 +170,10 @@ function Test-BuildEnvironment {
         Write-Host "   ✅ Mod directory found" -ForegroundColor Gray
     }
 
-    # Check build.gradle
-    $buildGradle = Join-Path $modDir "build.gradle"
+    # Check build.gradle.kts
+    $buildGradle = Join-Path $modDir "build.gradle.kts"
     if (-not (Test-Path $buildGradle)) {
-        $issues += "❌ build.gradle not found"
+        $issues += "❌ build.gradle.kts not found"
     } else {
         Write-Host "   ✅ Gradle build file found" -ForegroundColor Gray
     }
@@ -218,6 +314,7 @@ function Main {
 
     # Validate environment
     if (-not (Test-BuildEnvironment)) {
+        Read-Host
         exit 1
     }
 
@@ -230,6 +327,7 @@ function Main {
         if ($Clean) {
             $success = Invoke-Clean
             if (-not $success) {
+                Read-Host
                 exit 1
             }
         }
@@ -250,13 +348,16 @@ function Main {
 
         if ($success) {
             Write-Host "🎉 Mod build completed successfully!" -ForegroundColor Green
+            Read-Host
             exit 0
         } else {
             Write-Host "💥 Mod build failed!" -ForegroundColor Red
+            Read-Host
             exit 1
         }
     } catch {
         Write-Host "❌ Build error: $($_.Exception.Message)" -ForegroundColor Red
+        Read-Host
         exit 1
     } finally {
         Pop-Location

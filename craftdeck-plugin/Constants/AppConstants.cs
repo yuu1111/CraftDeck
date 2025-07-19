@@ -87,6 +87,16 @@ namespace CraftDeck.StreamDeckPlugin.Constants
             /// 汎用プレイヤーモニターアクション
             /// </summary>
             public const string PlayerMonitor = "com.craftdeck.plugin.action.playermonitor";
+
+            /// <summary>
+            /// プレイヤーレベルモニターアクション
+            /// </summary>
+            public const string PlayerLevel = "com.craftdeck.plugin.action.playerlevel";
+
+            /// <summary>
+            /// プレイヤー座標モニターアクション
+            /// </summary>
+            public const string PlayerPosition = "com.craftdeck.plugin.action.playerposition";
         }
 
         /// <summary>

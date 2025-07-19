@@ -12,9 +12,9 @@
 	</PropertyGroup>
 
 	<!-- Post build event scripts that deploy to stream deck -->
-	<Target Name="PostBuild" AfterTargets="PostBuildEvent" Condition=" '$(Configuration)'=='Debug'">
+	<!-- <Target Name="PostBuild" AfterTargets="PostBuildEvent" Condition=" '$(Configuration)'=='Debug'">
 		<Exec Command="powershell -ExecutionPolicy Unrestricted -file &quot;$(ProjectDir)CraftDeck.ps1&quot; -Action Deploy" />
-	</Target>
+	</Target> -->
 
 
 
@@ -140,12 +140,6 @@
 
 	</ItemGroup>
 
-	<!-- Build Helper -->
-	<ItemGroup>
-		<Content Include="CraftDeck.ps1">
-		  <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-		</Content>
-	</ItemGroup>
 
 	<!-- Include the README.md as part of the project for easy reference -->
 	<ItemGroup>
@@ -156,10 +150,6 @@
 
 	<!-- Localization Resources -->
 	<ItemGroup>
-		<EmbeddedResource Include="Resources\Localization.json" />
-		<Content Include="Resources\Localization.json">
-			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-		</Content>
 		<Content Include="locales\en.json">
 			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
 		</Content>
