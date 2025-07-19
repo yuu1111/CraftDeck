@@ -10,7 +10,7 @@ import net.minecraft.server.level.ServerPlayer
  * This demonstrates safe handling of features that only exist in newer versions.
  */
 object VersionSpecificFeatures {
-    
+
     /**
      * Example: Get armor trim information (1.20+ only)
      */
@@ -18,7 +18,7 @@ object VersionSpecificFeatures {
         if (!VersionAdapter.Features.hasSmithingTransform) {
             return null // Armor trims don't exist before 1.20
         }
-        
+
         return try {
             // Try to access armor trim data (this would normally use reflection or platform-specific code)
             val trimComponent = itemStack.tag?.get("Trim")
@@ -28,39 +28,39 @@ object VersionSpecificFeatures {
             null
         }
     }
-    
+
     /**
      * Example: Check if item is from new 1.20+ content
      */
     fun isModernItem(itemStack: ItemStack): Boolean {
         val itemId = itemStack.item.toString()
-        
+
         return when {
             // Cherry wood items (1.20+)
             VersionAdapter.Features.hasCherryWood && itemId.contains("cherry") -> true
-            
+
             // Suspicious sand/gravel (1.20+)
             VersionAdapter.Features.hasSuspiciousBlocks && itemId.contains("suspicious") -> true
-            
+
             // Trial chamber items (1.21+)
             VersionAdapter.Features.hasBreezeAndTrial && (
                 itemId.contains("trial") || itemId.contains("breeze")
             ) -> true
-            
+
             else -> false
         }
     }
-    
+
     /**
      * Example: Safe inventory scanning that handles version differences
      */
     fun scanPlayerInventory(player: ServerPlayer): Map<String, Any> {
         val inventoryData = mutableMapOf<String, Any>()
-        
+
         // Basic inventory data (works in all versions)
         inventoryData["size"] = player.inventory.items.size
         inventoryData["armor_count"] = player.inventory.armor.count { !it.isEmpty }
-        
+
         // Version-specific features
         if (VersionAdapter.Features.hasSmithingTransform) {
             // Count items with armor trims (1.20+)
@@ -69,7 +69,7 @@ object VersionSpecificFeatures {
             }
             inventoryData["trimmed_armor_count"] = trimmedArmor
         }
-        
+
         if (VersionAdapter.Features.hasSuspiciousBlocks) {
             // Count archaeology-related items (1.20+)
             val archaeologyItems = player.inventory.items.count { item ->
@@ -78,10 +78,10 @@ object VersionSpecificFeatures {
             }
             inventoryData["archaeology_items"] = archaeologyItems
         }
-        
+
         return inventoryData
     }
-    
+
     /**
      * Example: Handle display entities (1.19.4+)
      */
@@ -89,7 +89,7 @@ object VersionSpecificFeatures {
         if (!VersionAdapter.Features.hasDisplayEntity) {
             return null // Display entities don't exist before 1.19.4
         }
-        
+
         return try {
             // This would use reflection or platform-specific code to create display entity
             mapOf(
@@ -102,18 +102,18 @@ object VersionSpecificFeatures {
             null
         }
     }
-    
+
     /**
      * Example: Safe method to get all available features for current version
      */
     fun getAvailableFeatures(): List<String> {
         val features = mutableListOf<String>()
-        
+
         // Always available
         features.add("basic_player_data")
         features.add("inventory_tracking")
         features.add("command_execution")
-        
+
         // Version-specific
         if (VersionAdapter.Features.hasModernDimensions) features.add("modern_dimensions")
         if (VersionAdapter.Features.hasModernComponents) features.add("text_components")
@@ -123,7 +123,7 @@ object VersionSpecificFeatures {
         if (VersionAdapter.Features.hasCherryWood) features.add("cherry_biome")
         if (VersionAdapter.Features.hasSuspiciousBlocks) features.add("archaeology")
         if (VersionAdapter.Features.hasBreezeAndTrial) features.add("trial_chambers")
-        
+
         return features
     }
 }
