@@ -1,0 +1,35 @@
+{
+  "schemaVersion": 1,
+  "id": "${mod_id}",
+  "version": "${version}",
+  "name": "CraftDeck",
+  "description": "Integrates Minecraft with StreamDeck.",
+  "authors": [
+    "YourName"
+  ],
+  "contact": {
+    "homepage": "",
+    "sources": ""
+  },
+  "license": "MIT",
+  "icon": "assets/craftdeck/icon.png",
+  "environment": "*",
+  "entrypoints": {
+    "main": [
+      {
+        "adapter": "kotlin",
+        "value": "com.craftdeck.fabric.CraftDeckModFabric"
+      }
+    ]
+  },
+  "mixins": [
+    "craftdeck.mixins.json",
+    "craftdeck-common.mixins.json"
+  ],
+  "depends": {
+    "fabric": "*",
+    "minecraft": ">=${minecraft_version}",
+    "architectury": ">=${architectury_version}",
+    "fabric-language-kotlin": ">=${fabric_kotlin_version}"
+  }
+}

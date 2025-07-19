@@ -54,3 +54,6 @@ minecraft-mod/.gradle/
 minecraft-mod/*.jar
 minecraft-mod/*.zip
 minecraft-mod/*.log
+
+#Add
+CraftDeck.streamDeckPlugin

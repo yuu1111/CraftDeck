@@ -1,0 +1,45 @@
+{
+  "Actions": [
+    {
+      "Icon": "images/actionIcon",
+      "Name": "CraftDeck Action",
+      "States": [
+        {
+          "Image": "images/actionDefaultImage",
+          "TitleAlignment": "middle",
+          "FontSize": "16"
+        }
+      ],
+      "SupportedInMultiActions": false,
+      "Tooltip": "The first action for the MyPlugin Stream Deck plugin",
+      "UUID": "com.craftdeck.plugin.action.craftdeckaction"
+    }
+  ],
+	"Category": "CraftDeck",
+	"CategoryIcon": "images/category/categoryIcon",
+	"Disabled":  false,
+	"Author": "Your Name",
+	"CodePathWin": "CraftDeck.StreamDeckPlugin.exe",
+	"CodePathMac":  "CraftDeck.StreamDeckPlugin",
+  "PropertyInspectorPath": "property_inspector/property_inspector.html",
+  "Description": "Description of MyPlugin.",
+  "Name": "CraftDeck",
+  "UUID": "com.craftdeck.plugin",
+  "Icon": "images/pluginIcon",
+  "URL": "https://www.elgato.com/gaming/stream-deck",
+  "Version": "1.0",
+	"SDKVersion": 2,
+	"Software": {
+		"MinimumVersion":  "6.4"
+	},
+	"OS": [
+    {
+        "Platform": "mac",
+        "MinimumVersion" : "10.11"
+    },
+    {
+        "Platform": "windows",
+        "MinimumVersion" : "10"
+    }
+  ]
+}
