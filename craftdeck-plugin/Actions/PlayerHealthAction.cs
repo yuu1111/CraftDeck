@@ -19,13 +19,13 @@ namespace CraftDeck.StreamDeckPlugin.Actions
         public override async Task OnWillAppear(StreamDeckEventPayload args)
         {
             await base.OnWillAppear(args);
-            
+
             _currentContext = args.context;
-            
+
             // Register with shared WebSocket manager
             _clientId = Guid.NewGuid().ToString();
             SharedWebSocketManager.RegisterClient(_clientId, this);
-            
+
             // Start update timer
             _updateTimer = new Timer(1000);
             _updateTimer.Elapsed += async (sender, e) => await UpdateDisplay();
@@ -45,13 +45,13 @@ namespace CraftDeck.StreamDeckPlugin.Actions
         {
             _updateTimer?.Stop();
             _updateTimer?.Dispose();
-            
+
             // Unregister from shared WebSocket manager
             if (!string.IsNullOrEmpty(_clientId))
             {
                 SharedWebSocketManager.UnregisterClient(_clientId);
             }
-            
+
             await base.OnWillDisappear(args);
         }
 
@@ -64,29 +64,32 @@ namespace CraftDeck.StreamDeckPlugin.Actions
         private async Task UpdateDisplay()
         {
             if (string.IsNullOrEmpty(_currentContext)) return;
-            
+
             try
             {
                 string title;
                 var webSocketService = SharedWebSocketManager.WebSocketService;
+                var displayFormat = string.IsNullOrEmpty(SettingsModel.DisplayFormat) 
+                    ? DisplayFormatService.DefaultHealthFormat 
+                    : SettingsModel.DisplayFormat;
 
                 if (!webSocketService.IsConnected)
                 {
-                    title = "❤️ Offline";
+                    title = DisplayFormatService.FormatOfflineMessage(displayFormat, "❤️");
                 }
-                else if (_currentPlayerData != null && 
-                         (string.IsNullOrEmpty(SettingsModel.PlayerName) || 
+                else if (_currentPlayerData != null &&
+                         (string.IsNullOrEmpty(SettingsModel.PlayerName) ||
                           SettingsModel.PlayerName.Equals(_currentPlayerData.Name, StringComparison.OrdinalIgnoreCase)))
                 {
-                    title = $"❤️ {_currentPlayerData.Health:F0}/{_currentPlayerData.MaxHealth:F0}";
-                    
+                    title = DisplayFormatService.FormatPlayerData(displayFormat, _currentPlayerData);
+
                     // Change color based on health percentage
                     var healthPercent = _currentPlayerData.Health / _currentPlayerData.MaxHealth;
                     // Could set different background colors based on health here
                 }
                 else
                 {
-                    title = "❤️ --/--";
+                    title = DisplayFormatService.FormatNoDataMessage(displayFormat, "❤️");
                 }
 
                 await Manager.SetTitleAsync(_currentContext, title);
@@ -107,7 +110,7 @@ namespace CraftDeck.StreamDeckPlugin.Actions
         public void OnPlayerStatusReceived(PlayerStatusMessage playerStatus)
         {
             // Update if this is the player we're monitoring
-            if (string.IsNullOrEmpty(SettingsModel.PlayerName) || 
+            if (string.IsNullOrEmpty(SettingsModel.PlayerName) ||
                 SettingsModel.PlayerName.Equals(playerStatus.Name, StringComparison.OrdinalIgnoreCase))
             {
                 _currentPlayerData = playerStatus;

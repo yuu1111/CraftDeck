@@ -1,10 +1,10 @@
 package com.craftdeck.common
 
+import net.minecraft.commands.CommandSourceStack
+import net.minecraft.network.chat.Component
 import net.minecraft.server.MinecraftServer
-import net.minecraft.server.command.ServerCommandSource
-import net.minecraft.text.Text
-import net.minecraft.util.math.Vec3d
-import net.minecraft.util.math.Vec2f
+import net.minecraft.world.phys.Vec2
+import net.minecraft.world.phys.Vec3
 
 object CommandHandler {
     
@@ -24,19 +24,27 @@ object CommandHandler {
         return try {
             val commandSource = if (playerName != null) {
                 // Execute as specific player
-                val player = currentServer.playerManager.getPlayer(playerName)
+                val player = currentServer.playerList.getPlayerByName(playerName)
                 if (player != null) {
-                    player.commandSource
+                    player.createCommandSourceStack()
                 } else {
-                    // Fallback to server console
-                    createServerCommandSource(currentServer)
+                    return CommandResult(false, "Player '$playerName' not found")
                 }
             } else {
-                // Execute as server console
-                createServerCommandSource(currentServer)
+                // Auto-select first available player as sender
+                val availablePlayers = currentServer.playerList.players
+                if (availablePlayers.isNotEmpty()) {
+                    val firstPlayer = availablePlayers[0]
+                    CraftDeckMod.LOGGER.info("Auto-selecting player '${firstPlayer.name.string}' as command sender")
+                    firstPlayer.createCommandSourceStack()
+                } else {
+                    // No players online, use server console as fallback
+                    CraftDeckMod.LOGGER.warn("No players online, executing command as server console")
+                    createServerCommandSource(currentServer)
+                }
             }
             
-            val result = currentServer.commandManager.executeWithPrefix(commandSource, command)
+            val result = currentServer.commands.performPrefixedCommand(commandSource, command)
             CraftDeckMod.LOGGER.info("Executed command '$command' with result: $result")
             
             CommandResult(true, "Command executed successfully", result)
@@ -46,15 +54,15 @@ object CommandHandler {
         }
     }
     
-    private fun createServerCommandSource(server: MinecraftServer): ServerCommandSource {
-        return ServerCommandSource(
+    private fun createServerCommandSource(server: MinecraftServer): CommandSourceStack {
+        return CommandSourceStack(
             server,
-            Vec3d.ZERO,
-            Vec2f.ZERO,
-            server.overworld,
+            Vec3.ZERO,
+            Vec2.ZERO,
+            server.overworld(),
             4, // Permission level (operator)
             "CraftDeck",
-            Text.literal("CraftDeck"),
+            Component.literal("CraftDeck"),
             server,
             null
         )

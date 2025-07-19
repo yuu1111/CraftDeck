@@ -1,12 +1,11 @@
 package com.craftdeck.common
 
+import com.mojang.brigadier.context.CommandContext
+import dev.architectury.event.events.common.CommandRegistrationEvent
+import net.minecraft.commands.CommandSourceStack
+import net.minecraft.network.chat.Component
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
-import dev.architectury.event.events.common.CommandRegistrationEvent
-import com.mojang.brigadier.CommandDispatcher
-import com.mojang.brigadier.context.CommandContext
-import net.minecraft.server.command.ServerCommandSource
-import net.minecraft.text.Text
 
 object CraftDeckMod {
     const val MOD_ID = "craftdeck"
@@ -58,32 +57,32 @@ object CraftDeckMod {
     private fun registerCommands() {
         CommandRegistrationEvent.EVENT.register { dispatcher, registryAccess, environment ->
             dispatcher.register(
-                com.mojang.brigadier.builder.LiteralArgumentBuilder.literal<ServerCommandSource>("craftdeck")
-                    .then(com.mojang.brigadier.builder.LiteralArgumentBuilder.literal<ServerCommandSource>("status")
-                        .executes { context: CommandContext<ServerCommandSource> ->
+                com.mojang.brigadier.builder.LiteralArgumentBuilder.literal<CommandSourceStack>("craftdeck")
+                    .then(com.mojang.brigadier.builder.LiteralArgumentBuilder.literal<CommandSourceStack>("status")
+                        .executes { context: CommandContext<CommandSourceStack> ->
                             val server = webSocketServer
                             val clientCount = server?.getConnectedClientCount() ?: 0
                             val playerCount = GameDataCollector.getPlayerData().size
                             
-                            context.source.sendFeedback(
-                                Text.literal("CraftDeck Status:"), 
+                            context.source.sendSuccess(
+                                Component.literal("CraftDeck Status:"), 
                                 false
                             )
-                            context.source.sendFeedback(
-                                Text.literal("- WebSocket clients: $clientCount"), 
+                            context.source.sendSuccess(
+                                Component.literal("- WebSocket clients: $clientCount"), 
                                 false
                             )
-                            context.source.sendFeedback(
-                                Text.literal("- Tracked players: $playerCount"), 
+                            context.source.sendSuccess(
+                                Component.literal("- Tracked players: $playerCount"), 
                                 false
                             )
                             1
                         }
                     )
-                    .then(com.mojang.brigadier.builder.LiteralArgumentBuilder.literal<ServerCommandSource>("test")
-                        .executes { context: CommandContext<ServerCommandSource> ->
-                            context.source.sendFeedback(
-                                Text.literal("CraftDeck mod is working correctly!"), 
+                    .then(com.mojang.brigadier.builder.LiteralArgumentBuilder.literal<CommandSourceStack>("test")
+                        .executes { context: CommandContext<CommandSourceStack> ->
+                            context.source.sendSuccess(
+                                Component.literal("CraftDeck mod is working correctly!"), 
                                 false
                             )
                             1

@@ -6,7 +6,8 @@ var websocket = null,
   settingsModel = {
     PlayerName: "",
     ServerUrl: "ws://localhost:8080",
-    AutoConnect: true
+    AutoConnect: true,
+    DisplayFormat: ""
   };
 
 function connectElgatoStreamDeckSocket(inPort, inUUID, inRegisterEvent, inInfo, inActionInfo) {
@@ -21,12 +22,14 @@ function connectElgatoStreamDeckSocket(inPort, inUUID, inRegisterEvent, inInfo, 
     settingsModel.PlayerName = settings.PlayerName || "";
     settingsModel.ServerUrl = settings.ServerUrl || "ws://localhost:8080";
     settingsModel.AutoConnect = settings.AutoConnect !== undefined ? settings.AutoConnect : true;
+    settingsModel.DisplayFormat = settings.DisplayFormat || "";
   }
 
   // Set initial values in the UI
   document.getElementById('playerName').value = settingsModel.PlayerName;
   document.getElementById('serverUrl').value = settingsModel.ServerUrl;
   document.getElementById('autoConnect').checked = settingsModel.AutoConnect;
+  document.getElementById('displayFormat').value = settingsModel.DisplayFormat;
 
   websocket.onopen = function () {
     var json = { event: inRegisterEvent, uuid: inUUID };
@@ -43,11 +46,13 @@ function connectElgatoStreamDeckSocket(inPort, inUUID, inRegisterEvent, inInfo, 
           settingsModel.PlayerName = settings.PlayerName || "";
           settingsModel.ServerUrl = settings.ServerUrl || "ws://localhost:8080";
           settingsModel.AutoConnect = settings.AutoConnect !== undefined ? settings.AutoConnect : true;
+          settingsModel.DisplayFormat = settings.DisplayFormat || "";
           
           // Update UI
           document.getElementById('playerName').value = settingsModel.PlayerName;
           document.getElementById('serverUrl').value = settingsModel.ServerUrl;
           document.getElementById('autoConnect').checked = settingsModel.AutoConnect;
+          document.getElementById('displayFormat').value = settingsModel.DisplayFormat;
         }
         break;
       default:

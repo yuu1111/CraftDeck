@@ -169,7 +169,7 @@ namespace CraftDeck.StreamDeckPlugin.Services
             try
             {
                 var baseMessage = JsonConvert.DeserializeObject<WebSocketMessage>(message);
-                
+
                 switch (baseMessage.Type)
                 {
                     case "connection":

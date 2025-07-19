@@ -49,7 +49,7 @@ namespace CraftDeck.StreamDeckPlugin
         if (_isConnected && !string.IsNullOrEmpty(SettingsModel.Command))
         {
           var success = await _webSocketService.SendCommandAsync(
-            SettingsModel.Command, 
+            SettingsModel.Command,
             string.IsNullOrEmpty(SettingsModel.PlayerName) ? null : SettingsModel.PlayerName
           );
 
@@ -77,7 +77,7 @@ namespace CraftDeck.StreamDeckPlugin
     public override async Task OnDidReceiveSettings(StreamDeckEventPayload args)
     {
       await base.OnDidReceiveSettings(args);
-      
+
       // Update WebSocket URL if changed
       if (_webSocketService != null && !string.IsNullOrEmpty(SettingsModel.ServerUrl))
       {
@@ -94,7 +94,7 @@ namespace CraftDeck.StreamDeckPlugin
     public override async Task OnWillAppear(StreamDeckEventPayload args)
     {
       await base.OnWillAppear(args);
-      
+
       // Start update timer for dynamic content
       _updateTimer = new Timer(1000); // Update every second
       _updateTimer.Elapsed += async (sender, e) => await UpdateDisplay(args.context);
@@ -202,7 +202,7 @@ namespace CraftDeck.StreamDeckPlugin
       // Update instances that are monitoring this player
       foreach (var instance in GetAllInstances())
       {
-        if (string.IsNullOrEmpty(instance.SettingsModel.PlayerName) || 
+        if (string.IsNullOrEmpty(instance.SettingsModel.PlayerName) ||
             instance.SettingsModel.PlayerName.Equals(playerStatus.Name, StringComparison.OrdinalIgnoreCase))
         {
           instance._currentPlayerData = playerStatus;
@@ -232,7 +232,7 @@ namespace CraftDeck.StreamDeckPlugin
     {
       _updateTimer?.Stop();
       _updateTimer?.Dispose();
-      
+
       lock (_instances)
       {
         _instances.Remove(this);

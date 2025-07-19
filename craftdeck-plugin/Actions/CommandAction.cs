@@ -17,7 +17,7 @@ namespace CraftDeck.StreamDeckPlugin.Actions
             try
             {
                 var webSocketService = SharedWebSocketManager.WebSocketService;
-                
+
                 if (!webSocketService.IsConnected)
                 {
                     await webSocketService.ConnectAsync();
@@ -55,11 +55,11 @@ namespace CraftDeck.StreamDeckPlugin.Actions
         public override async Task OnWillAppear(StreamDeckEventPayload args)
         {
             await base.OnWillAppear(args);
-            
+
             // Register with shared WebSocket manager
             _clientId = Guid.NewGuid().ToString();
             SharedWebSocketManager.RegisterClient(_clientId, this);
-            
+
             // Set command as title
             var title = string.IsNullOrEmpty(SettingsModel.Command) ? "Command" : SettingsModel.Command;
             await Manager.SetTitleAsync(args.context, title);
@@ -78,7 +78,7 @@ namespace CraftDeck.StreamDeckPlugin.Actions
         public override async Task OnDidReceiveSettings(StreamDeckEventPayload args)
         {
             await base.OnDidReceiveSettings(args);
-            
+
             // Update title when settings change
             var title = string.IsNullOrEmpty(SettingsModel.Command) ? "Command" : SettingsModel.Command;
             await Manager.SetTitleAsync(args.context, title);

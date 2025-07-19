@@ -42,6 +42,10 @@ dependencies {
 
     // Fabric Kotlin
     modImplementation("net.fabricmc:fabric-language-kotlin:${rootProject.property("fabric_kotlin_version")}")
+    
+    // Include Java-WebSocket in the JAR
+    implementation("org.java-websocket:Java-WebSocket:1.5.3")
+    include("org.java-websocket:Java-WebSocket:1.5.3")
 }
 
 tasks.processResources {

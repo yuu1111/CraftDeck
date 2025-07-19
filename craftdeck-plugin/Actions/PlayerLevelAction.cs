@@ -9,63 +9,86 @@ using CraftDeck.StreamDeckPlugin.Models;
 namespace CraftDeck.StreamDeckPlugin.Actions
 {
     [ActionUuid(Uuid = "com.craftdeck.plugin.action.playerlevel")]
-    public class PlayerLevelAction : BaseStreamDeckActionWithSettingsModel<Models.PlayerMonitorSettingsModel>
+    public class PlayerLevelAction : BaseStreamDeckActionWithSettingsModel<Models.PlayerMonitorSettingsModel>, IWebSocketClient
     {
-        private static MinecraftWebSocketService _webSocketService;
         private Timer _updateTimer;
         private PlayerStatusMessage _currentPlayerData;
-
-        static PlayerLevelAction()
-        {
-            _webSocketService = new MinecraftWebSocketService();
-            _webSocketService.PlayerStatusReceived += OnPlayerStatusReceived;
-        }
+        private string _clientId;
+        private string _currentContext;
 
         public override async Task OnWillAppear(StreamDeckEventPayload args)
         {
             await base.OnWillAppear(args);
-            
+
+            _currentContext = args.context;
+
+            // Register with shared WebSocket manager
+            _clientId = Guid.NewGuid().ToString();
+            SharedWebSocketManager.RegisterClient(_clientId, this);
+
+            // Start update timer
             _updateTimer = new Timer(1000);
-            _updateTimer.Elapsed += async (sender, e) => await UpdateDisplay(args.context);
+            _updateTimer.Elapsed += async (sender, e) => await UpdateDisplay();
             _updateTimer.Start();
 
-            if (!_webSocketService.IsConnected)
+            // Auto-connect if not connected
+            var webSocketService = SharedWebSocketManager.WebSocketService;
+            if (!webSocketService.IsConnected)
             {
-                await _webSocketService.ConnectAsync();
+                await webSocketService.ConnectAsync();
             }
 
-            await UpdateDisplay(args.context);
+            await UpdateDisplay();
         }
 
         public override async Task OnWillDisappear(StreamDeckEventPayload args)
         {
             _updateTimer?.Stop();
             _updateTimer?.Dispose();
+
+            // Unregister from shared WebSocket manager
+            if (!string.IsNullOrEmpty(_clientId))
+            {
+                SharedWebSocketManager.UnregisterClient(_clientId);
+            }
+
             await base.OnWillDisappear(args);
         }
 
-        private async Task UpdateDisplay(string context)
+        public override async Task OnDidReceiveSettings(StreamDeckEventPayload args)
         {
+            await base.OnDidReceiveSettings(args);
+            await UpdateDisplay();
+        }
+
+        private async Task UpdateDisplay()
+        {
+            if (string.IsNullOrEmpty(_currentContext)) return;
+
             try
             {
                 string title;
+                var webSocketService = SharedWebSocketManager.WebSocketService;
+                var displayFormat = string.IsNullOrEmpty(SettingsModel.DisplayFormat) 
+                    ? DisplayFormatService.DefaultLevelFormat 
+                    : SettingsModel.DisplayFormat;
 
-                if (!_webSocketService.IsConnected)
+                if (!webSocketService.IsConnected)
                 {
-                    title = "⭐ Offline";
+                    title = DisplayFormatService.FormatOfflineMessage(displayFormat, "⭐");
                 }
-                else if (_currentPlayerData != null && 
-                         (string.IsNullOrEmpty(SettingsModel.PlayerName) || 
+                else if (_currentPlayerData != null &&
+                         (string.IsNullOrEmpty(SettingsModel.PlayerName) ||
                           SettingsModel.PlayerName.Equals(_currentPlayerData.Name, StringComparison.OrdinalIgnoreCase)))
                 {
-                    title = $"⭐ Lv.{_currentPlayerData.Level}";
+                    title = DisplayFormatService.FormatPlayerData(displayFormat, _currentPlayerData);
                 }
                 else
                 {
-                    title = "⭐ Lv.--";
+                    title = DisplayFormatService.FormatNoDataMessage(displayFormat, "⭐");
                 }
 
-                await Manager.SetTitleAsync(context, title);
+                await Manager.SetTitleAsync(_currentContext, title);
             }
             catch (Exception ex)
             {
@@ -73,9 +96,47 @@ namespace CraftDeck.StreamDeckPlugin.Actions
             }
         }
 
-        private static void OnPlayerStatusReceived(PlayerStatusMessage playerStatus)
+        // IWebSocketClient implementation
+        public void OnConnectionStateChanged(bool connected)
         {
-            // Instance management would be needed here
+            // Update display when connection state changes
+            _ = Task.Run(async () => await UpdateDisplay());
+        }
+
+        public void OnPlayerStatusReceived(PlayerStatusMessage playerStatus)
+        {
+            // Update if this is the player we're monitoring
+            if (string.IsNullOrEmpty(SettingsModel.PlayerName) ||
+                SettingsModel.PlayerName.Equals(playerStatus.Name, StringComparison.OrdinalIgnoreCase))
+            {
+                _currentPlayerData = playerStatus;
+                _ = Task.Run(async () => await UpdateDisplay());
+            }
+        }
+
+        public void OnPlayerJoined(PlayerJoinMessage playerJoin)
+        {
+            // Not needed for level action
+        }
+
+        public void OnPlayerLeft(PlayerLeaveMessage playerLeave)
+        {
+            // Clear data if the monitored player left
+            if (_currentPlayerData != null && _currentPlayerData.Name.Equals(playerLeave.Player, StringComparison.OrdinalIgnoreCase))
+            {
+                _currentPlayerData = null;
+                _ = Task.Run(async () => await UpdateDisplay());
+            }
+        }
+
+        public void OnCommandResultReceived(CommandResultMessage result)
+        {
+            // Not needed for level action
+        }
+
+        public void OnErrorReceived(string error)
+        {
+            Console.WriteLine($"WebSocket error in level action: {error}");
         }
     }
 }

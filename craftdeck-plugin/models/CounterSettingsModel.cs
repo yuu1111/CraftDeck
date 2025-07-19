@@ -23,6 +23,7 @@
     public string PlayerName { get; set; } = "";
     public string ServerUrl { get; set; } = "ws://localhost:8080";
     public bool AutoConnect { get; set; } = true;
+    public string DisplayFormat { get; set; } = "";
   }
 
   // Keep the old model for backward compatibility
