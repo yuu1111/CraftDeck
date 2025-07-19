@@ -3,6 +3,3 @@ contact_links:
   - name: CraftDeck Documentation
     url: https://github.com/[username]/craftdeck/wiki
     about: Check the documentation and user guides before reporting issues
-  - name: Minecraft Modding Community
-    url: https://discord.gg/minecraft-modding
-    about: General Minecraft modding support and community discussions
