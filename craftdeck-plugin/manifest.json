@@ -47,8 +47,8 @@
 	"SDKVersion": 2,
 	"DefaultWindowSize": [500, 650],
 	"Localization": {
-		"en": "en.json",
-		"ja": "ja.json"
+		"en": "locales/en.json",
+		"ja": "locales/ja.json"
 	},
 	"Software": {
 		"MinimumVersion":  "6.4"

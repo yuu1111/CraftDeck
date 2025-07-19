@@ -20,41 +20,60 @@ namespace CraftDeck.StreamDeckPlugin.Services
         }
 
         /// <summary>
-        /// ローカライゼーションデータをロード（フォールバックデータのみ）
+        /// ローカライゼーションデータをlocalesフォルダから読み込み
         /// </summary>
         private static void LoadLocalizationData()
         {
-            // 現在は en.json と ja.json を使用しているため、フォールバックのみ提供
-            CreateFallbackData();
-        }
+            try
+            {
+                _localizationData = new JObject();
+                var baseDirectory = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
+                var localesPath = Path.Combine(baseDirectory, "locales");
 
-        /// <summary>
-        /// フォールバック用の基本データを作成
-        /// </summary>
-        private static void CreateFallbackData()
-        {
-            _localizationData = JObject.Parse(@"{
-                ""en"": {
-                    ""common"": {
-                        ""offline"": ""Offline"",
-                        ""noData"": ""No Data""
-                    },
-                    ""health"": {
-                        ""offline"": ""❤️ Offline"",
-                        ""noData"": ""❤️ --/--""
+                if (!Directory.Exists(localesPath))
+                {
+                    throw new DirectoryNotFoundException($"Locales directory not found: {localesPath}");
+                }
+
+                // サポートされている言語ファイルを読み込み
+                var supportedLanguages = new[] { "en", "ja" };
+                foreach (var lang in supportedLanguages)
+                {
+                    var filePath = Path.Combine(localesPath, $"{lang}.json");
+                    if (File.Exists(filePath))
+                    {
+                        var content = File.ReadAllText(filePath);
+                        var langData = JObject.Parse(content);
+                        
+                        // Localizationセクションを取得（StreamDeck用の構造）
+                        if (langData["Localization"] != null)
+                        {
+                            _localizationData[lang] = langData["Localization"];
+                        }
+                        else
+                        {
+                            // 直接言語データとして使用
+                            _localizationData[lang] = langData;
+                        }
+                        
+                        Console.WriteLine($"Loaded localization for: {lang}");
                     }
-                },
-                ""ja"": {
-                    ""common"": {
-                        ""offline"": ""オフライン"",
-                        ""noData"": ""データなし""
-                    },
-                    ""health"": {
-                        ""offline"": ""❤️ オフライン"",
-                        ""noData"": ""❤️ --/--""
+                    else
+                    {
+                        Console.WriteLine($"Warning: Localization file not found: {filePath}");
                     }
                 }
-            }");
+
+                if (_localizationData.Count == 0)
+                {
+                    throw new InvalidOperationException("No localization files could be loaded");
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error loading localization data: {ex.Message}");
+                throw new InvalidOperationException("Failed to initialize localization system", ex);
+            }
         }
 
         /// <summary>
