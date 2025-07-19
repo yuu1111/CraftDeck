@@ -59,17 +59,17 @@ $hasChanges = (git status --porcelain | Measure-Object).Count -gt 0
 if ($hasChanges) {
     Write-Host "`nLocal changes detected:" -ForegroundColor Yellow
     git status --short
-    
+
     # Commit and push changes
     Write-Host "`nCommitting changes..." -ForegroundColor Yellow
     git add .
     git commit -m "Update wiki content
 
 Updated from main repository commit: $(git -C "$PSScriptRoot\.." rev-parse --short HEAD)"
-    
+
     Write-Host "`nPushing to GitHub Wiki..." -ForegroundColor Yellow
     git push origin master
-    
+
     Write-Host "`nWiki push completed successfully!" -ForegroundColor Green
 } else {
     Write-Host "`nNo changes detected. Wiki is up to date." -ForegroundColor Green
