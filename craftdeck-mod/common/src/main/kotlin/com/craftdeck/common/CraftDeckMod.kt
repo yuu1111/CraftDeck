@@ -2,6 +2,11 @@ package com.craftdeck.common
 
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
+import dev.architectury.event.events.common.CommandRegistrationEvent
+import com.mojang.brigadier.CommandDispatcher
+import com.mojang.brigadier.context.CommandContext
+import net.minecraft.server.command.ServerCommandSource
+import net.minecraft.text.Text
 
 object CraftDeckMod {
     const val MOD_ID = "craftdeck"
@@ -17,9 +22,21 @@ object CraftDeckMod {
             val port = 8080 // TODO: Make this configurable
             webSocketServer = CraftDeckWebSocketServer(port)
             webSocketServer?.start()
+            LOGGER.info("WebSocket server started on port $port")
         } catch (e: Exception) {
             LOGGER.error("Failed to start WebSocket server", e)
         }
+
+        // Initialize game data collector
+        try {
+            GameDataCollector.init()
+            LOGGER.info("Game data collector initialized")
+        } catch (e: Exception) {
+            LOGGER.error("Failed to initialize game data collector", e)
+        }
+
+        // Register commands
+        registerCommands()
 
         // Register shutdown hook
         Runtime.getRuntime().addShutdownHook(Thread {
@@ -33,6 +50,46 @@ object CraftDeckMod {
             webSocketServer?.stop()
         } catch (e: Exception) {
             LOGGER.error("Failed to stop WebSocket server", e)
+        }
+    }
+    
+    fun getWebSocketServer(): CraftDeckWebSocketServer? = webSocketServer
+    
+    private fun registerCommands() {
+        CommandRegistrationEvent.EVENT.register { dispatcher, registryAccess, environment ->
+            dispatcher.register(
+                com.mojang.brigadier.builder.LiteralArgumentBuilder.literal<ServerCommandSource>("craftdeck")
+                    .then(com.mojang.brigadier.builder.LiteralArgumentBuilder.literal<ServerCommandSource>("status")
+                        .executes { context: CommandContext<ServerCommandSource> ->
+                            val server = webSocketServer
+                            val clientCount = server?.getConnectedClientCount() ?: 0
+                            val playerCount = GameDataCollector.getPlayerData().size
+                            
+                            context.source.sendFeedback(
+                                Text.literal("CraftDeck Status:"), 
+                                false
+                            )
+                            context.source.sendFeedback(
+                                Text.literal("- WebSocket clients: $clientCount"), 
+                                false
+                            )
+                            context.source.sendFeedback(
+                                Text.literal("- Tracked players: $playerCount"), 
+                                false
+                            )
+                            1
+                        }
+                    )
+                    .then(com.mojang.brigadier.builder.LiteralArgumentBuilder.literal<ServerCommandSource>("test")
+                        .executes { context: CommandContext<ServerCommandSource> ->
+                            context.source.sendFeedback(
+                                Text.literal("CraftDeck mod is working correctly!"), 
+                                false
+                            )
+                            1
+                        }
+                    )
+            )
         }
     }
 }

@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="utf-8" />
+	<title>Player Monitor Settings</title>
+	<link rel="stylesheet" href="css/sdpi.css">
+	<link rel="stylesheet" href="css/property-inspector.css">
+</head>
+<body>
+	<div class="sdpi-wrapper">
+		<div class="sdpi-item">
+			<div class="sdpi-item-label">Player Name</div>
+			<input id="playerName" class="sdpi-item-value" type="text" placeholder="Enter player name to monitor (leave empty for any player)" onchange="setSettings(event.target.value, 'PlayerName')" />
+		</div>
+
+		<div class="sdpi-item">
+			<div class="sdpi-item-label">Server URL</div>
+			<input id="serverUrl" class="sdpi-item-value" type="text" placeholder="ws://localhost:8080" onchange="setSettings(event.target.value, 'ServerUrl')" />
+		</div>
+
+		<div class="sdpi-item">
+			<div class="sdpi-item-label">Auto Connect</div>
+			<input id="autoConnect" class="sdpi-item-value" type="checkbox" onchange="setSettings(event.target.checked, 'AutoConnect')" />
+		</div>
+
+		<div class="sdpi-item">
+			<div class="sdpi-item-label">Information</div>
+			<div class="sdpi-item-value" style="font-size: 12px; color: #999;">
+				<p><strong>Player Name:</strong></p>
+				<p>• Leave empty to monitor the first available player</p>
+				<p>• Enter specific player name to monitor only that player</p>
+				<br>
+				<p><strong>Real-time Updates:</strong></p>
+				<p>• Health: Shows current/max health with ❤️ icon</p>
+				<p>• Position: Shows X,Y,Z coordinates with 📍 icon</p>
+				<p>• Level: Shows experience level with ⭐ icon</p>
+			</div>
+		</div>
+	</div>
+	<script src="js/player-monitor-inspector.js"></script>
+</body>
+</html>

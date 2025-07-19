@@ -5,7 +5,11 @@ var websocket = null,
   inInfo = null,
   actionInfo = {},
   settingsModel = {
-	Counter: 0
+	Command: "",
+	PlayerName: "",
+	DisplayMode: "command",
+	ServerUrl: "ws://localhost:8080",
+	AutoConnect: true
   };
 
 function connectElgatoStreamDeckSocket(inPort, inUUID, inRegisterEvent, inInfo, inActionInfo) {
@@ -16,16 +20,25 @@ function connectElgatoStreamDeckSocket(inPort, inUUID, inRegisterEvent, inInfo, 
 
   //initialize values
   if (actionInfo.payload.settings.settingsModel) {
-	settingsModel.Counter = actionInfo.payload.settings.settingsModel.Counter;
+	var settings = actionInfo.payload.settings.settingsModel;
+	settingsModel.Command = settings.Command || "";
+	settingsModel.PlayerName = settings.PlayerName || "";
+	settingsModel.DisplayMode = settings.DisplayMode || "command";
+	settingsModel.ServerUrl = settings.ServerUrl || "ws://localhost:8080";
+	settingsModel.AutoConnect = settings.AutoConnect !== undefined ? settings.AutoConnect : true;
   }
 
-  document.getElementById('txtCounterValue').value = settingsModel.Counter;
+  // Set initial values in the UI
+  document.getElementById('command').value = settingsModel.Command;
+  document.getElementById('playerName').value = settingsModel.PlayerName;
+  document.getElementById('displayMode').value = settingsModel.DisplayMode;
+  document.getElementById('serverUrl').value = settingsModel.ServerUrl;
+  document.getElementById('autoConnect').checked = settingsModel.AutoConnect;
 
   websocket.onopen = function () {
 	var json = { event: inRegisterEvent, uuid: inUUID };
 	// register property inspector to Stream Deck
 	websocket.send(JSON.stringify(json));
-
   };
 
   websocket.onmessage = function (evt) {
@@ -34,9 +47,20 @@ function connectElgatoStreamDeckSocket(inPort, inUUID, inRegisterEvent, inInfo, 
 	var sdEvent = jsonObj['event'];
 	switch (sdEvent) {
 	  case "didReceiveSettings":
-		if (jsonObj.payload.settings.settingsModel.Counter) {
-		  settingsModel.Counter = jsonObj.payload.settings.settingsModel.Counter;
-		  document.getElementById('txtCounterValue').value = settingsModel.Counter;
+		if (jsonObj.payload.settings.settingsModel) {
+		  var settings = jsonObj.payload.settings.settingsModel;
+		  settingsModel.Command = settings.Command || "";
+		  settingsModel.PlayerName = settings.PlayerName || "";
+		  settingsModel.DisplayMode = settings.DisplayMode || "command";
+		  settingsModel.ServerUrl = settings.ServerUrl || "ws://localhost:8080";
+		  settingsModel.AutoConnect = settings.AutoConnect !== undefined ? settings.AutoConnect : true;
+		  
+		  // Update UI
+		  document.getElementById('command').value = settingsModel.Command;
+		  document.getElementById('playerName').value = settingsModel.PlayerName;
+		  document.getElementById('displayMode').value = settingsModel.DisplayMode;
+		  document.getElementById('serverUrl').value = settingsModel.ServerUrl;
+		  document.getElementById('autoConnect').checked = settingsModel.AutoConnect;
 		}
 		break;
 	  default:
@@ -58,4 +82,13 @@ const setSettings = (value, param) => {
 	websocket.send(JSON.stringify(json));
   }
 };
+
+// Update connection status (this would be called from the main plugin)
+function updateConnectionStatus(isConnected) {
+  var statusElement = document.getElementById('connectionStatus');
+  if (statusElement) {
+	statusElement.textContent = isConnected ? "Connected" : "Disconnected";
+	statusElement.style.color = isConnected ? "#4CAF50" : "#999";
+  }
+}
 

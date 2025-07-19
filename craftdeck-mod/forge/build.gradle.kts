@@ -8,14 +8,14 @@ architectury {
 }
 
 loom {
-    accessWidenerPath.set(project(":common").loom.accessWidenerPath)
+    // accessWidenerPath.set(project(":common").loom.accessWidenerPath)
 
     forge.apply {
-        convertAccessWideners.set(true)
-        extraAccessWideners.add(loom.accessWidenerPath.get().asFile.name)
+        // convertAccessWideners.set(true)
+        // extraAccessWideners.add(loom.accessWidenerPath.get().asFile.name)
 
-        mixinConfig("examplemod-common.mixins.json")
-        mixinConfig("examplemod.mixins.json")
+        // mixinConfig("craftdeck-common.mixins.json")
+        // mixinConfig("craftdeck.mixins.json")
     }
 }
 
@@ -74,7 +74,7 @@ tasks.shadowJar {
 }
 
 tasks.remapJar {
-    injectAccessWidener.set(true)
+    // injectAccessWidener.set(true)
     inputFile.set(tasks.shadowJar.get().archiveFile)
     dependsOn(tasks.shadowJar)
     archiveClassifier.set(null as String?)

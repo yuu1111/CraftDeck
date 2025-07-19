@@ -2,7 +2,7 @@
   "Actions": [
     {
       "Icon": "images/actionIcon",
-      "Name": "CraftDeck Action",
+      "Name": "CraftDeck Multi-Action",
       "States": [
         {
           "Image": "images/actionDefaultImage",
@@ -11,18 +11,78 @@
         }
       ],
       "SupportedInMultiActions": false,
-      "Tooltip": "The first action for the MyPlugin Stream Deck plugin",
+      "Tooltip": "CraftDeck - Configurable Minecraft integration",
       "UUID": "com.craftdeck.plugin.action.craftdeckaction"
+    },
+    {
+      "Icon": "images/commandIcon",
+      "Name": "Command Executor",
+      "States": [
+        {
+          "Image": "images/commandDefaultImage",
+          "TitleAlignment": "middle",
+          "FontSize": "14"
+        }
+      ],
+      "SupportedInMultiActions": true,
+      "Tooltip": "Execute Minecraft commands",
+      "UUID": "com.craftdeck.plugin.action.command",
+      "PropertyInspectorPath": "property_inspector/command_inspector.html"
+    },
+    {
+      "Icon": "images/healthIcon",
+      "Name": "Player Health",
+      "States": [
+        {
+          "Image": "images/healthDefaultImage",
+          "TitleAlignment": "middle",
+          "FontSize": "14"
+        }
+      ],
+      "SupportedInMultiActions": false,
+      "Tooltip": "Monitor player health in real-time",
+      "UUID": "com.craftdeck.plugin.action.playerhealth",
+      "PropertyInspectorPath": "property_inspector/player_monitor_inspector.html"
+    },
+    {
+      "Icon": "images/positionIcon",
+      "Name": "Player Position",
+      "States": [
+        {
+          "Image": "images/positionDefaultImage",
+          "TitleAlignment": "middle",
+          "FontSize": "12"
+        }
+      ],
+      "SupportedInMultiActions": false,
+      "Tooltip": "Monitor player coordinates in real-time",
+      "UUID": "com.craftdeck.plugin.action.playerposition",
+      "PropertyInspectorPath": "property_inspector/player_monitor_inspector.html"
+    },
+    {
+      "Icon": "images/levelIcon",
+      "Name": "Player Level",
+      "States": [
+        {
+          "Image": "images/levelDefaultImage",
+          "TitleAlignment": "middle",
+          "FontSize": "14"
+        }
+      ],
+      "SupportedInMultiActions": false,
+      "Tooltip": "Monitor player experience level in real-time",
+      "UUID": "com.craftdeck.plugin.action.playerlevel",
+      "PropertyInspectorPath": "property_inspector/player_monitor_inspector.html"
     }
   ],
 	"Category": "CraftDeck",
 	"CategoryIcon": "images/category/categoryIcon",
 	"Disabled":  false,
-	"Author": "Your Name",
+	"Author": "CraftDeck Team",
 	"CodePathWin": "CraftDeck.StreamDeckPlugin.exe",
 	"CodePathMac":  "CraftDeck.StreamDeckPlugin",
   "PropertyInspectorPath": "property_inspector/property_inspector.html",
-  "Description": "Description of MyPlugin.",
+  "Description": "Integrates Minecraft with StreamDeck for real-time game monitoring and control.",
   "Name": "CraftDeck",
   "UUID": "com.craftdeck.plugin",
   "Icon": "images/pluginIcon",

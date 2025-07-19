@@ -3,7 +3,8 @@ architectury {
 }
 
 loom {
-    accessWidenerPath.set(file("src/main/resources/examplemod.accesswidener"))
+    // Access widener not needed for now
+    // accessWidenerPath.set(file("src/main/resources/craftdeck.accesswidener"))
 }
 
 dependencies {

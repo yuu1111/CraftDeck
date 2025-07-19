@@ -14,7 +14,7 @@ architectury {
 }
 
 loom {
-    accessWidenerPath.set(project(":common").loom.accessWidenerPath)
+    // accessWidenerPath.set(project(":common").loom.accessWidenerPath)
 }
 
 val common: Configuration by configurations.creating
@@ -37,12 +37,6 @@ dependencies {
         isTransitive = false
     }
     shadowCommon(project(":common", "transformProductionFabric")){
-        isTransitive = false
-    }
-    common(project(":fabric-like", "namedElements")){
-        isTransitive = false
-    }
-    shadowCommon(project(":fabric-like", "transformProductionFabric")) {
         isTransitive = false
     }
 
@@ -74,7 +68,7 @@ tasks.shadowJar {
 }
 
 tasks.remapJar {
-    injectAccessWidener.set(true)
+    // injectAccessWidener.set(true)
     inputFile.set(tasks.shadowJar.get().archiveFile)
     dependsOn(tasks.shadowJar)
     archiveClassifier.set(null as String?)

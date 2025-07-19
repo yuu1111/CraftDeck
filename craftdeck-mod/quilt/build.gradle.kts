@@ -44,12 +44,12 @@ dependencies {
     shadowCommon(project(":common", "transformProductionQuilt")){
         isTransitive = false
     }
-    common(project(":fabric-like", "namedElements")){
+    /*common(project(":fabric-like", "namedElements")){
         isTransitive = false
     }
     shadowCommon(project(":fabric-like", "transformProductionQuilt")) {
         isTransitive = false
-    }
+    }*/
 
     modApi("org.quiltmc.quilt-kotlin-libraries:quilt-kotlin-libraries:${rootProject.property("quilt_kotlin_libraries_version")}")
 }

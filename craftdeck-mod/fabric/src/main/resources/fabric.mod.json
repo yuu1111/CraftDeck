@@ -18,14 +18,10 @@
     "main": [
       {
         "adapter": "kotlin",
-        "value": "com.craftdeck.fabric.CraftDeckModFabric"
+        "value": "com.craftdeck.fabric.CraftDeckFabric"
       }
     ]
   },
-  "mixins": [
-    "craftdeck.mixins.json",
-    "craftdeck-common.mixins.json"
-  ],
   "depends": {
     "fabric": "*",
     "minecraft": ">=${minecraft_version}",

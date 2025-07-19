@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="utf-8" />
+	<title>Command Executor Settings</title>
+	<link rel="stylesheet" href="css/sdpi.css">
+	<link rel="stylesheet" href="css/property-inspector.css">
+</head>
+<body>
+	<div class="sdpi-wrapper">
+		<div class="sdpi-item">
+			<div class="sdpi-item-label">Minecraft Command</div>
+			<input id="command" class="sdpi-item-value" type="text" placeholder="Enter command (e.g., /say Hello World)" onchange="setSettings(event.target.value, 'Command')" />
+		</div>
+
+		<div class="sdpi-item">
+			<div class="sdpi-item-label">Player Name (optional)</div>
+			<input id="playerName" class="sdpi-item-value" type="text" placeholder="Execute as specific player" onchange="setSettings(event.target.value, 'PlayerName')" />
+		</div>
+
+		<div class="sdpi-item">
+			<div class="sdpi-item-label">Server URL</div>
+			<input id="serverUrl" class="sdpi-item-value" type="text" placeholder="ws://localhost:8080" onchange="setSettings(event.target.value, 'ServerUrl')" />
+		</div>
+
+		<div class="sdpi-item">
+			<div class="sdpi-item-label">Examples</div>
+			<div class="sdpi-item-value" style="font-size: 12px; color: #999;">
+				<p><strong>Commands:</strong></p>
+				<p>• <code>/say Hello from StreamDeck!</code></p>
+				<p>• <code>/time set day</code></p>
+				<p>• <code>/weather clear</code></p>
+				<p>• <code>/tp @a ~ ~10 ~</code></p>
+				<p>• <code>/gamemode creative</code></p>
+				<br>
+				<p><strong>Player Name:</strong> Leave empty for console commands</p>
+			</div>
+		</div>
+	</div>
+	<script src="js/command-inspector.js"></script>
+</body>
+</html>

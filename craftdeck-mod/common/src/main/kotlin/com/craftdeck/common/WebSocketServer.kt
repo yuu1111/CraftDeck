@@ -4,28 +4,136 @@ import org.java_websocket.server.WebSocketServer
 import org.java_websocket.handshake.ClientHandshake
 import org.java_websocket.WebSocket
 import java.net.InetSocketAddress
+import java.util.concurrent.ConcurrentHashMap
 
 class CraftDeckWebSocketServer(port: Int) : WebSocketServer(InetSocketAddress(port)) {
-
+    
+    private val connectedClients = ConcurrentHashMap<WebSocket, String>()
+    
     override fun onStart() {
-        println("WebSocket server started successfully on port $port")
+        CraftDeckMod.LOGGER.info("WebSocket server started successfully on port $port")
     }
 
     override fun onOpen(conn: WebSocket, handshake: ClientHandshake) {
-        println("New connection from ${conn.remoteSocketAddress.address.hostAddress}")
+        val clientAddress = conn.remoteSocketAddress.address.hostAddress
+        connectedClients[conn] = clientAddress
+        CraftDeckMod.LOGGER.info("New connection from $clientAddress")
+        
+        // Send initial connection confirmation
+        val message = """{"type":"connection","status":"connected","message":"Welcome to CraftDeck"}"""
+        conn.send(message)
     }
 
     override fun onClose(conn: WebSocket, code: Int, reason: String, remote: Boolean) {
-        println("Closed connection to ${conn.remoteSocketAddress.address.hostAddress}")
+        val clientAddress = connectedClients.remove(conn)
+        CraftDeckMod.LOGGER.info("Closed connection to $clientAddress (code: $code, reason: $reason)")
     }
 
     override fun onMessage(conn: WebSocket, message: String) {
-        println("Received message from ${conn.remoteSocketAddress.address.hostAddress}: $message")
-        // Echo back the message for now
-        conn.send("Echo: $message")
+        val clientAddress = connectedClients[conn]
+        CraftDeckMod.LOGGER.info("Received message from $clientAddress: $message")
+        
+        try {
+            handleMessage(conn, message)
+        } catch (e: Exception) {
+            CraftDeckMod.LOGGER.error("Error handling message: $message", e)
+            val errorResponse = """{"type":"error","message":"Failed to process command: ${e.message}"}"""
+            conn.send(errorResponse)
+        }
     }
 
     override fun onError(conn: WebSocket?, ex: Exception) {
-        ex.printStackTrace()
+        CraftDeckMod.LOGGER.error("WebSocket error", ex)
     }
+    
+    private fun handleMessage(conn: WebSocket, message: String) {
+        try {
+            // Parse JSON message (basic parsing for now)
+            when {
+                message.contains("\"type\":\"execute_command\"") -> {
+                    handleCommandExecution(conn, message)
+                }
+                message.contains("\"type\":\"get_player_data\"") -> {
+                    handlePlayerDataRequest(conn)
+                }
+                else -> {
+                    // Echo back with JSON format for unknown messages
+                    val response = """{"type":"echo","original":"$message","timestamp":"${System.currentTimeMillis()}"}"""
+                    conn.send(response)
+                }
+            }
+        } catch (e: Exception) {
+            CraftDeckMod.LOGGER.error("Error parsing message: $message", e)
+            val errorResponse = """{"type":"error","message":"Invalid message format"}"""
+            conn.send(errorResponse)
+        }
+    }
+    
+    private fun handleCommandExecution(conn: WebSocket, message: String) {
+        try {
+            // Extract command from JSON (basic extraction)
+            val commandStart = message.indexOf("\"command\":\"") + 11
+            val commandEnd = message.indexOf("\"", commandStart)
+            val command = message.substring(commandStart, commandEnd)
+            
+            // Extract player name if specified
+            val playerName = if (message.contains("\"player\":\"")) {
+                val playerStart = message.indexOf("\"player\":\"") + 10
+                val playerEnd = message.indexOf("\"", playerStart)
+                message.substring(playerStart, playerEnd)
+            } else null
+            
+            val result = CommandHandler.executeCommand(command, playerName)
+            
+            val response = buildString {
+                append("""{"type":"command_result",""")
+                append(""""success":${result.success},""")
+                append(""""message":"${result.message.replace("\"", "\\\"")},"""")
+                append(""""result":${result.result}""")
+                append("}")
+            }
+            
+            conn.send(response)
+        } catch (e: Exception) {
+            CraftDeckMod.LOGGER.error("Error executing command", e)
+            val errorResponse = """{"type":"error","message":"Command execution failed: ${e.message}"}"""
+            conn.send(errorResponse)
+        }
+    }
+    
+    private fun handlePlayerDataRequest(conn: WebSocket) {
+        val playerData = GameDataCollector.getPlayerData()
+        val response = buildString {
+            append("""{"type":"player_data","players":[""")
+            playerData.values.forEachIndexed { index, info ->
+                if (index > 0) append(",")
+                append("""{""")
+                append(""""uuid":"${info.uuid}",""")
+                append(""""name":"${info.name}",""")
+                append(""""health":${info.health},""")
+                append(""""max_health":${info.maxHealth},""")
+                append(""""food":${info.food},""")
+                append(""""experience":${info.experience},""")
+                append(""""level":${info.level},""")
+                append(""""gamemode":"${info.gameMode}",""")
+                append(""""position":{"x":${info.posX},"y":${info.posY},"z":${info.posZ}},""")
+                append(""""dimension":"${info.dimension}"""")
+                append("}")
+            }
+            append("]}")
+        }
+        conn.send(response)
+    }
+    
+    fun broadcastToAll(message: String) {
+        connectedClients.keys.forEach { conn ->
+            try {
+                conn.send(message)
+            } catch (e: Exception) {
+                CraftDeckMod.LOGGER.error("Failed to send message to client", e)
+            }
+        }
+    }
+    
+    fun getConnectedClientCount(): Int = connectedClients.size
 }

@@ -2,23 +2,60 @@
 <html>
 <head>
 	<meta charset="utf-8" />
-	<title>MyPlugin Property Inspector</title>
+	<title>CraftDeck Property Inspector</title>
 	<link rel="stylesheet" href="css/sdpi.css">
 	<link rel="stylesheet" href="css/property-inspector.css">
 </head>
 <body>
 	<div class="sdpi-wrapper">
-		<!-- for more examples of the types of fields supported in property inspector visit:
-			Elgato Github PiSamples -> https://github.com/elgatosf/streamdeck-pisamples
-			and
-			Elgato SDK Documentation -> https://developer.elgato.com/documentation/stream-deck/sdk/property-inspector/
-	-->
-
-		<div class="sdpi-item" id="counter_value">
-			<div class="sdpi-item-label">Counter Value</div>
-			<input id="txtCounterValue" class="sdpi-item-value" type="number" inputmode="numeric" pattern="[0-9]*" placeholder="Enter counter number" onchange="setSettings(event.target.value, 'Counter')" />
+		<div class="sdpi-item">
+			<div class="sdpi-item-label">Display Mode</div>
+			<select id="displayMode" class="sdpi-item-value" onchange="setSettings(event.target.value, 'DisplayMode')">
+				<option value="command">Command Button</option>
+				<option value="health">Player Health</option>
+				<option value="position">Player Position</option>
+				<option value="level">Player Level</option>
+			</select>
 		</div>
 
+		<div class="sdpi-item">
+			<div class="sdpi-item-label">Command</div>
+			<input id="command" class="sdpi-item-value" type="text" placeholder="Enter Minecraft command (e.g., /say Hello)" onchange="setSettings(event.target.value, 'Command')" />
+		</div>
+
+		<div class="sdpi-item">
+			<div class="sdpi-item-label">Player Name (optional)</div>
+			<input id="playerName" class="sdpi-item-value" type="text" placeholder="Enter player name for specific commands" onchange="setSettings(event.target.value, 'PlayerName')" />
+		</div>
+
+		<div class="sdpi-item">
+			<div class="sdpi-item-label">Server URL</div>
+			<input id="serverUrl" class="sdpi-item-value" type="text" placeholder="ws://localhost:8080" onchange="setSettings(event.target.value, 'ServerUrl')" />
+		</div>
+
+		<div class="sdpi-item">
+			<div class="sdpi-item-label">Auto Connect</div>
+			<input id="autoConnect" class="sdpi-item-value" type="checkbox" onchange="setSettings(event.target.checked, 'AutoConnect')" />
+		</div>
+
+		<div class="sdpi-item">
+			<div class="sdpi-item-label">Connection Status</div>
+			<div id="connectionStatus" class="sdpi-item-value" style="color: #999;">Disconnected</div>
+		</div>
+
+		<div class="sdpi-item">
+			<div class="sdpi-item-label">Instructions</div>
+			<div class="sdpi-item-value" style="font-size: 12px; color: #999;">
+				<p><strong>Display Modes:</strong></p>
+				<p>• <strong>Command Button:</strong> Executes specified command when pressed</p>
+				<p>• <strong>Player Health:</strong> Shows real-time health/max health</p>
+				<p>• <strong>Player Position:</strong> Shows X,Y,Z coordinates</p>
+				<p>• <strong>Player Level:</strong> Shows experience level and progress</p>
+				<br>
+				<p><strong>Commands:</strong> Use standard Minecraft commands (e.g., /say Hello, /tp @a ~ ~10 ~)</p>
+				<p><strong>Player Name:</strong> Leave empty to use console commands, or specify a player for player-specific commands</p>
+			</div>
+		</div>
 	</div>
 	<script src="js/property-inspector.js"></script>
 </body>
