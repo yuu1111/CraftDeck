@@ -3,11 +3,13 @@ package com.craftdeck.common
 import dev.architectury.event.events.common.PlayerEvent
 import dev.architectury.event.events.common.TickEvent
 import net.minecraft.server.level.ServerPlayer
+import net.minecraft.server.MinecraftServer
 import java.util.concurrent.ConcurrentHashMap
 
 object GameDataCollector {
 
     private val playerData = ConcurrentHashMap<String, PlayerInfo>()
+    private var server: MinecraftServer? = null
     private var tickCounter = 0
     private const val UPDATE_INTERVAL = 20 // Send updates every second (20 ticks)
 
@@ -45,21 +47,28 @@ object GameDataCollector {
         CraftDeckMod.LOGGER.info("GameDataCollector initialized")
     }
 
+    fun setServer(server: MinecraftServer) {
+        this.server = server
+        CommandHandler.setServer(server)
+    }
+
     private fun onPlayerJoin(player: ServerPlayer) {
-        CraftDeckMod.LOGGER.info("Player joined: ${player.name.string}")
+        val playerName = VersionAdapter.getPlayerDisplayName(player)
+        CraftDeckMod.LOGGER.info("Player joined: $playerName")
         updatePlayerData(player)
 
         val webSocketServer = CraftDeckMod.getWebSocketServer()
-        val message = """{"type":"player_join","player":"${player.name.string}","uuid":"${player.stringUUID}"}"""
+        val message = """{"type":"player_join","player":"$playerName","uuid":"${player.stringUUID}"}"""
         webSocketServer?.broadcastToAll(message)
     }
 
     private fun onPlayerLeave(player: ServerPlayer) {
-        CraftDeckMod.LOGGER.info("Player left: ${player.name.string}")
+        val playerName = VersionAdapter.getPlayerDisplayName(player)
+        CraftDeckMod.LOGGER.info("Player left: $playerName")
         playerData.remove(player.stringUUID)
 
         val webSocketServer = CraftDeckMod.getWebSocketServer()
-        val message = """{"type":"player_leave","player":"${player.name.string}","uuid":"${player.stringUUID}"}"""
+        val message = """{"type":"player_leave","player":"$playerName","uuid":"${player.stringUUID}"}"""
         webSocketServer?.broadcastToAll(message)
     }
 
@@ -82,17 +91,17 @@ object GameDataCollector {
     private fun updatePlayerData(player: ServerPlayer) {
         val info = PlayerInfo(
             uuid = player.stringUUID,
-            name = player.name.string,
+            name = VersionAdapter.getPlayerDisplayName(player),
             health = player.health,
             maxHealth = player.maxHealth,
             food = player.foodData.foodLevel,
             experience = player.experienceProgress,
             level = player.experienceLevel,
-            gameMode = "SURVIVAL", // TODO: Fix gameMode access
+            gameMode = VersionAdapter.getGameMode(player),
             posX = player.x,
             posY = player.y,
             posZ = player.z,
-            dimension = player.level.dimension().location().toString()
+            dimension = VersionAdapter.getDimensionName(player)
         )
 
         playerData[player.stringUUID] = info

@@ -4,6 +4,7 @@ import com.mojang.brigadier.context.CommandContext
 import dev.architectury.event.events.common.CommandRegistrationEvent
 import net.minecraft.commands.CommandSourceStack
 import net.minecraft.network.chat.Component
+import net.minecraft.server.MinecraftServer
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 
@@ -53,6 +54,16 @@ object CraftDeckMod {
     }
 
     fun getWebSocketServer(): CraftDeckWebSocketServer? = webSocketServer
+
+    fun onServerStarted(server: MinecraftServer) {
+        LOGGER.info("Server started, CraftDeck is ready")
+        GameDataCollector.setServer(server)
+    }
+
+    fun onServerStopped() {
+        LOGGER.info("Server stopped, stopping CraftDeck")
+        stop()
+    }
 
     private fun registerCommands() {
         CommandRegistrationEvent.EVENT.register { dispatcher, registryAccess, environment ->

@@ -1,0 +1,10 @@
+{
+    "pack": {
+        "description": "CraftDeck resources",
+        "pack_format": 15,
+        "supported_formats": {
+            "min_inclusive": 13,
+            "max_inclusive": 18
+        }
+    }
+}

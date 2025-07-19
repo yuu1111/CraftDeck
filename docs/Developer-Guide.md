@@ -351,7 +351,7 @@ private fun buildPlayerStatusMessage(info: PlayerInfo): String {
 public class PlayerStatusMessage : WebSocketMessage
 {
     // existing properties...
-    
+
     [JsonProperty("new_field")]
     public string NewField { get; set; }
 }
