@@ -1,0 +1,210 @@
+name: Build CraftDeck
+
+on:
+  push:
+    branches: [ master, main, develop ]
+  pull_request:
+    branches: [ master, main ]
+  workflow_dispatch:
+
+jobs:
+  build-minecraft-mod:
+    name: Build Minecraft Mod
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v4
+
+    - name: Set up JDK 17
+      uses: actions/setup-java@v4
+      with:
+        java-version: '17'
+        distribution: 'temurin'
+
+    - name: Cache Gradle packages
+      uses: actions/cache@v3
+      with:
+        path: |
+          ~/.gradle/caches
+          ~/.gradle/wrapper
+        key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle*', '**/gradle-wrapper.properties') }}
+        restore-keys: |
+          ${{ runner.os }}-gradle-
+
+    - name: Grant execute permission for gradlew
+      run: chmod +x craftdeck-mod/gradlew
+
+    - name: Build Minecraft Mod
+      run: |
+        cd craftdeck-mod
+        ./gradlew build
+
+    - name: Upload Minecraft Mod Artifacts
+      uses: actions/upload-artifact@v3
+      with:
+        name: minecraft-mod-jars
+        path: |
+          craftdeck-mod/common/build/libs/*.jar
+          craftdeck-mod/fabric/build/libs/*.jar
+          craftdeck-mod/forge/build/libs/*.jar
+          craftdeck-mod/quilt/build/libs/*.jar
+        retention-days: 30
+
+  build-streamdeck-plugin:
+    name: Build StreamDeck Plugin
+    runs-on: windows-latest
+
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v4
+
+    - name: Setup .NET
+      uses: actions/setup-dotnet@v4
+      with:
+        dotnet-version: '6.0.x'
+
+    - name: Restore dependencies
+      run: dotnet restore CraftDeckSolution.sln
+
+    - name: Build StreamDeck Plugin
+      run: dotnet build CraftDeckSolution.sln -c Release --no-restore
+
+    - name: Publish StreamDeck Plugin
+      run: dotnet publish craftdeck-plugin/CraftDeck.StreamDeckPlugin.csproj -c Release --self-contained -r win-x64 -o publish/
+
+    - name: Create .streamDeckPlugin package
+      run: |
+        # Create plugin package directory
+        mkdir plugin-package
+
+        # Copy published binaries
+        cp -r publish/* plugin-package/
+
+        # Copy plugin assets (manifest.json, images, property_inspector, etc.)
+        cp craftdeck-plugin/manifest.json plugin-package/
+        cp -r craftdeck-plugin/images plugin-package/
+        cp -r craftdeck-plugin/property_inspector plugin-package/
+        cp craftdeck-plugin/en.json plugin-package/
+        cp craftdeck-plugin/ja.json plugin-package/
+
+        # Create .streamDeckPlugin file (ZIP with specific extension)
+        cd plugin-package
+        7z a -tzip ../CraftDeck.streamDeckPlugin *
+
+    - name: Upload StreamDeck Plugin Artifacts
+      uses: actions/upload-artifact@v3
+      with:
+        name: streamdeck-plugin
+        path: CraftDeck.streamDeckPlugin
+        retention-days: 30
+
+  test:
+    name: Run Tests
+    runs-on: ubuntu-latest
+    needs: [build-minecraft-mod]
+
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v4
+
+    - name: Set up JDK 17
+      uses: actions/setup-java@v4
+      with:
+        java-version: '17'
+        distribution: 'temurin'
+
+    - name: Cache Gradle packages
+      uses: actions/cache@v3
+      with:
+        path: |
+          ~/.gradle/caches
+          ~/.gradle/wrapper
+        key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle*', '**/gradle-wrapper.properties') }}
+        restore-keys: |
+          ${{ runner.os }}-gradle-
+
+    - name: Run Tests
+      run: |
+        cd craftdeck-mod
+        chmod +x gradlew
+        ./gradlew test
+
+  create-release:
+    name: Create Release
+    runs-on: ubuntu-latest
+    needs: [build-minecraft-mod, build-streamdeck-plugin, test]
+    if: github.event_name == 'push' && (github.ref == 'refs/heads/master' || github.ref == 'refs/heads/main')
+
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v4
+
+    - name: Download Minecraft Mod Artifacts
+      uses: actions/download-artifact@v3
+      with:
+        name: minecraft-mod-jars
+        path: artifacts/minecraft-mod/
+
+    - name: Download StreamDeck Plugin Artifacts
+      uses: actions/download-artifact@v3
+      with:
+        name: streamdeck-plugin
+        path: ./
+
+    - name: Get version from manifest
+      id: get_version
+      run: |
+        VERSION=$(jq -r '.Version' craftdeck-plugin/manifest.json)
+        echo "version=$VERSION" >> $GITHUB_OUTPUT
+
+    - name: Create Release
+      id: create_release
+      uses: actions/create-release@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        tag_name: v${{ steps.get_version.outputs.version }}
+        release_name: CraftDeck v${{ steps.get_version.outputs.version }}
+        draft: false
+        prerelease: false
+        body: |
+          ## CraftDeck v${{ steps.get_version.outputs.version }}
+
+          ### Changes in this release
+          - Automated build from latest commit
+
+          ### Installation
+          1. **Minecraft Mod**: Place the appropriate JAR file in your mods folder
+             - Fabric: Use the fabric JAR
+             - Forge: Use the forge JAR
+             - Quilt: Use the quilt JAR
+          2. **StreamDeck Plugin**: Double-click the .streamDeckPlugin file to install
+
+          ### Requirements
+          - Minecraft 1.20.1+
+          - StreamDeck Software
+          - Java 17+
+
+    - name: Upload Minecraft Mod to Release
+      run: |
+        for file in artifacts/minecraft-mod/*.jar; do
+          if [ -f "$file" ]; then
+            filename=$(basename "$file")
+            curl -X POST \
+              -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" \
+              -H "Content-Type: application/java-archive" \
+              --data-binary @"$file" \
+              "${{ steps.create_release.outputs.upload_url }}?name=$filename&label=$filename"
+          fi
+        done
+
+    - name: Upload StreamDeck Plugin to Release
+      uses: actions/upload-release-asset@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        upload_url: ${{ steps.create_release.outputs.upload_url }}
+        asset_path: ./CraftDeck.streamDeckPlugin
+        asset_name: CraftDeck-v${{ steps.get_version.outputs.version }}.streamDeckPlugin
+        asset_content_type: application/zip

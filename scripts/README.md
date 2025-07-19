@@ -46,6 +46,42 @@
 .\Build-CraftDeck.ps1 -SkipTests
 ```
 
+### 📦 Release-CraftDeck.ps1
+**用途**: リリース用パッケージ作成スクリプト
+**説明**: 本番リリース用のパッケージを作成します。.streamDeckPlugin形式でStreamDeckプラグインを生成。
+
+```powershell
+# バージョン1.0.0のリリースパッケージを作成
+.\Release-CraftDeck.ps1 -Version "1.0.0"
+
+# 指定ディレクトリに出力
+.\Release-CraftDeck.ps1 -Version "1.0.0" -OutputDir "C:\Releases"
+
+# ZIPファイルも同時作成
+.\Release-CraftDeck.ps1 -Version "1.0.0" -CreateZip
+
+# テストをスキップしてビルド
+.\Release-CraftDeck.ps1 -Version "1.0.0" -SkipTests
+```
+
+### 🏷️ Prepare-Release.ps1
+**用途**: リリース準備スクリプト
+**説明**: バージョン番号の更新、CHANGELOG.md の生成、Git タグの作成を行います。
+
+```powershell
+# バージョン1.0.0のリリース準備
+.\Prepare-Release.ps1 -Version "1.0.0"
+
+# リリースノートを含めて準備
+.\Prepare-Release.ps1 -Version "1.0.0" -ReleaseNotes "新機能を追加しました"
+
+# Gitタグも同時作成
+.\Prepare-Release.ps1 -Version "1.0.0" -CreateTag
+
+# ドライランで動作確認
+.\Prepare-Release.ps1 -Version "1.0.0" -DryRun
+```
+
 ## パラメータ説明
 
 ### 共通パラメータ
@@ -69,6 +105,24 @@
 | `-Clean` | ビルド前にクリーンを実行 |
 | `-SkipTests` | テスト実行をスキップ |
 
+### Release-CraftDeck.ps1 専用
+
+| パラメータ | 説明 | デフォルト |
+|-----------|------|-----------|
+| `-Version` | リリースバージョン（必須） | - |
+| `-OutputDir` | 出力ディレクトリ | `.\release` |
+| `-CreateZip` | リリース用ZIPファイルを作成 | `false` |
+| `-SkipTests` | テスト実行をスキップ | `false` |
+
+### Prepare-Release.ps1 専用
+
+| パラメータ | 説明 | デフォルト |
+|-----------|------|-----------|
+| `-Version` | リリースバージョン（必須） | - |
+| `-ReleaseNotes` | リリースノート | `""` |
+| `-CreateTag` | Gitタグを作成 | `false` |
+| `-DryRun` | ドライラン（実際には変更しない） | `false` |
+
 ## 使用シナリオ
 
 ### 🎯 開発中の日常ワークフロー
@@ -87,11 +141,30 @@
 ### 🚢 リリース準備
 
 ```powershell
-# 1. 全体をクリーンビルド
-.\Build-CraftDeck.ps1 -Clean -Configuration Release
+# 1. リリース準備（バージョン更新、CHANGELOG作成）
+.\Prepare-Release.ps1 -Version "1.0.0" -ReleaseNotes "初回リリース" -CreateTag
 
-# 2. 本番デプロイ
-.\Deploy-CraftDeck.ps1 -Configuration Release
+# 2. リリースパッケージ作成
+.\Release-CraftDeck.ps1 -Version "1.0.0" -CreateZip
+
+# 3. GitHub にプッシュ
+git push origin main
+git push origin v1.0.0
+```
+
+### 🎯 完全なリリースワークフロー
+
+```powershell
+# ステップ1: バージョン更新とCHANGELOG準備
+.\Prepare-Release.ps1 -Version "1.2.0" -ReleaseNotes "新機能追加、バグ修正" -DryRun  # 確認
+.\Prepare-Release.ps1 -Version "1.2.0" -ReleaseNotes "新機能追加、バグ修正" -CreateTag  # 実行
+
+# ステップ2: リリースパッケージ作成
+.\Release-CraftDeck.ps1 -Version "1.2.0" -CreateZip
+
+# ステップ3: GitHub Actions でのリリース作成
+git push origin main
+git push origin v1.2.0
 ```
 
 ### 🐛 問題調査

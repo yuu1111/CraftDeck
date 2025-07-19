@@ -36,7 +36,7 @@ param(
     [string]$Configuration = "Debug",
 
     [switch]$Clean,
-    
+
     [switch]$SkipTests
 )
 
@@ -49,12 +49,12 @@ $pluginPath = Join-Path $scriptRoot "craftdeck-plugin"
 # Clean build artifacts
 function Invoke-Clean {
     param([string]$ProjectPath, [string]$ProjectType)
-    
+
     Write-Host "🧹 Cleaning $ProjectType..." -ForegroundColor Cyan
-    
+
     try {
         Push-Location $ProjectPath
-        
+
         if ($ProjectType -eq "Mod") {
             if ($IsWindows) {
                 .\gradlew.bat clean
@@ -63,7 +63,7 @@ function Invoke-Clean {
             }
         } else {
             dotnet clean
-            
+
             $cleanDirs = @("bin", "obj", "publish")
             foreach ($dir in $cleanDirs) {
                 $fullPath = Join-Path $ProjectPath $dir
@@ -72,7 +72,7 @@ function Invoke-Clean {
                 }
             }
         }
-        
+
         Write-Host "✅ $ProjectType cleaned" -ForegroundColor Green
         return $true
     } catch {
@@ -86,29 +86,29 @@ function Invoke-Clean {
 # Build Minecraft Mod
 function Build-MinecraftMod {
     Write-Host "🔨 Building Minecraft Mod..." -ForegroundColor Cyan
-    
+
     if (-not (Test-Path $modPath)) {
         Write-Host "❌ Mod directory not found: $modPath" -ForegroundColor Red
         return $false
     }
-    
+
     try {
         Push-Location $modPath
-        
+
         if ($Clean) {
             Invoke-Clean -ProjectPath $modPath -ProjectType "Mod"
         }
-        
+
         Write-Host "   Running Gradle build..." -ForegroundColor Gray
         if ($IsWindows) {
             .\gradlew.bat build
         } else {
             ./gradlew build
         }
-        
+
         # Display build artifacts
         Show-ModBuildInfo
-        
+
         Write-Host "✅ Minecraft Mod built successfully" -ForegroundColor Green
         return $true
     } catch {
@@ -122,33 +122,33 @@ function Build-MinecraftMod {
 # Build StreamDeck Plugin
 function Build-StreamDeckPlugin {
     Write-Host "🔨 Building StreamDeck Plugin..." -ForegroundColor Cyan
-    
+
     if (-not (Test-Path $pluginPath)) {
         Write-Host "❌ Plugin directory not found: $pluginPath" -ForegroundColor Red
         return $false
     }
-    
+
     try {
         Push-Location $pluginPath
-        
+
         if ($Clean) {
             Invoke-Clean -ProjectPath $pluginPath -ProjectType "Plugin"
         }
-        
+
         Write-Host "   Configuration: $Configuration" -ForegroundColor Gray
-        
+
         # Build solution
         dotnet build -c $Configuration
-        
+
         # Run tests if not skipped
         if (-not $SkipTests) {
             Write-Host "   Running tests..." -ForegroundColor Gray
             dotnet test --configuration $Configuration --no-build
         }
-        
+
         # Display build info
         Show-PluginBuildInfo
-        
+
         Write-Host "✅ StreamDeck Plugin built successfully" -ForegroundColor Green
         return $true
     } catch {
@@ -162,9 +162,9 @@ function Build-StreamDeckPlugin {
 # Show mod build information
 function Show-ModBuildInfo {
     Write-Host "📊 Build Information:" -ForegroundColor Cyan
-    
+
     $platforms = @("common", "fabric", "forge", "quilt")
-    
+
     foreach ($platform in $platforms) {
         $buildDir = Join-Path $modPath "$platform\build\libs"
         if (Test-Path $buildDir) {
@@ -181,7 +181,7 @@ function Show-ModBuildInfo {
 # Show plugin build information
 function Show-PluginBuildInfo {
     Write-Host "📊 Build Information:" -ForegroundColor Cyan
-    
+
     $buildDir = Join-Path $pluginPath "bin\$Configuration\net6.0"
     if (Test-Path $buildDir) {
         $dll = Join-Path $buildDir "CraftDeck.StreamDeckPlugin.dll"
@@ -190,7 +190,7 @@ function Show-PluginBuildInfo {
             $size = [math]::Round($dllInfo.Length / 1KB, 1)
             Write-Host "   Assembly: CraftDeck.StreamDeckPlugin.dll ($size KB)" -ForegroundColor Gray
         }
-        
+
         # Check for runtime-specific builds
         $runtimes = @("win-x64", "osx-x64", "linux-x64")
         foreach ($runtime in $runtimes) {
@@ -210,9 +210,9 @@ function Show-PluginBuildInfo {
 # Validate build environment
 function Test-BuildEnvironment {
     Write-Host "🔍 Validating build environment..." -ForegroundColor Cyan
-    
+
     $issues = @()
-    
+
     # Check .NET SDK
     try {
         $dotnetVersion = dotnet --version
@@ -220,7 +220,7 @@ function Test-BuildEnvironment {
     } catch {
         $issues += "❌ .NET SDK not found or not accessible"
     }
-    
+
     # Check Java for Gradle
     try {
         $javaVersion = java -version 2>&1 | Select-Object -First 1
@@ -228,20 +228,20 @@ function Test-BuildEnvironment {
     } catch {
         $issues += "❌ Java not found (required for Minecraft mod build)"
     }
-    
+
     # Check project files
     if (-not (Test-Path (Join-Path $modPath "build.gradle"))) {
         $issues += "❌ Mod build.gradle not found"
     } else {
         Write-Host "   ✅ Mod project files found" -ForegroundColor Gray
     }
-    
+
     if (-not (Test-Path (Join-Path $pluginPath "CraftDeck.StreamDeckPlugin.csproj"))) {
         $issues += "❌ Plugin project file not found"
     } else {
         Write-Host "   ✅ Plugin project files found" -ForegroundColor Gray
     }
-    
+
     if ($issues.Count -gt 0) {
         Write-Host "`nBuild environment issues:" -ForegroundColor Red
         foreach ($issue in $issues) {
@@ -249,7 +249,7 @@ function Test-BuildEnvironment {
         }
         return $false
     }
-    
+
     Write-Host "✅ Build environment validated" -ForegroundColor Green
     return $true
 }
@@ -258,21 +258,21 @@ function Test-BuildEnvironment {
 function Main {
     Write-Host "🔨 CraftDeck Project Build" -ForegroundColor Magenta
     Write-Host "========================`n" -ForegroundColor Magenta
-    
+
     Write-Host "Component: $Component" -ForegroundColor Gray
     Write-Host "Configuration: $Configuration" -ForegroundColor Gray
     if ($Clean) { Write-Host "Clean: Yes" -ForegroundColor Gray }
     if ($SkipTests) { Write-Host "Skip Tests: Yes" -ForegroundColor Gray }
     Write-Host ""
-    
+
     # Validate environment
     if (-not (Test-BuildEnvironment)) {
         exit 1
     }
-    
+
     $success = $true
     $startTime = Get-Date
-    
+
     # Build components based on selection
     switch ($Component) {
         "Mod" {
@@ -288,12 +288,12 @@ function Main {
             }
         }
     }
-    
+
     $duration = (Get-Date) - $startTime
-    
+
     Write-Host ""
     Write-Host "⏱️  Build time: $($duration.TotalSeconds.ToString('F1')) seconds" -ForegroundColor Gray
-    
+
     if ($success) {
         Write-Host "🎉 Build completed successfully!" -ForegroundColor Green
         exit 0

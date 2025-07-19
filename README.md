@@ -1,74 +1,163 @@
-# Minecraft & StreamDeck 連携システム
+# CraftDeck
 
-## 1. 概要
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+[![Java](https://img.shields.io/badge/Java-17+-orange.svg)](https://www.oracle.com/java/)
+[![.NET](https://img.shields.io/badge/.NET-6.0+-purple.svg)](https://dotnet.microsoft.com/)
+[![Minecraft](https://img.shields.io/badge/Minecraft-1.19+-green.svg)](https://minecraft.net/)
 
-本プロジェクトは、Minecraft のゲーム内情報を StreamDeck にリアルタイム表示し、StreamDeck のボタン操作を通じて Minecraft の特定コマンドを実行できるシステムを構築することを目的とします。これにより、プレイヤーはより直感的かつ効率的にゲームを操作できるようになります。
+A real-time bridge between Minecraft and Elgato Stream Deck, enabling interactive game monitoring and control directly from your Stream Deck device.
 
-## 2. 目標
+[日本語版 README](README-JP.md) | [Documentation](../../wiki) | [Contributing](CONTRIBUTING.md)
 
-*   **Minecraft の主要なゲーム内情報を StreamDeck に分かりやすく表示する。**
-*   **StreamDeck のボタンから定義済みの Minecraft コマンドを実行可能にする。**
-*   シングルプレイヤー、および Mod 導入が許可されたマルチプレイヤー環境下で、**各プレイヤーのクライアントサイドで完結するソリューションを提供する。**
-*   将来的に**他の Minecraft Mod と連携可能な API を提供する。**
-*   将来的に**サーバーサイド機能（サーバー監視・管理）への拡張を可能にする。**
+## 🎮 Features
 
-## クイックスタート
+- **Real-time Game Data**: Display player health, coordinates, experience, inventory, and more
+- **Interactive Commands**: Execute Minecraft commands directly from Stream Deck buttons
+- **Multi-Platform Support**: Works with Fabric, Forge, and Quilt mod loaders
+- **Customizable Interface**: Configure what information appears on each Stream Deck key
+- **Low Latency**: WebSocket-based communication for instant updates
+- **Easy Setup**: Simple installation process for both Minecraft mod and Stream Deck plugin
 
-### 🚀 一括デプロイ (推奨)
-```powershell
-# PowerShell で実行 (Windows/macOS/Linux)
-.\Scripts\Deploy-CraftDeck.ps1
-```
-
-### 🔨 開発ビルド
-```powershell
-# ビルドのみ実行 (デプロイなし)
-.\Scripts\Build-CraftDeck.ps1
-
-# StreamDeck Plugin のみビルド
-.\Scripts\Build-CraftDeck.ps1 -Component Plugin
-
-# Minecraft Mod のみビルド
-.\Scripts\Build-CraftDeck.ps1 -Component Mod
-```
-
-詳細な使用方法は [Scripts/README.md](Scripts/README.md) を参照してください。
-
-## プロジェクト構成
-
-```
-CraftDeck/
-├── Scripts/                    # 🔧 開発・デプロイスクリプト
-│   ├── Deploy-CraftDeck.ps1   # 本番デプロイ用
-│   ├── Build-CraftDeck.ps1    # 開発ビルド用
-│   └── README.md              # スクリプト使用方法
-├── craftdeck-mod/             # 🎮 Minecraft Mod (Kotlin/Architectury)
-└── craftdeck-plugin/          # 🎛️ StreamDeck Plugin (C#/.NET 6)
-```
-
-## 実装済み機能
+## 📋 Requirements
 
 ### Minecraft Mod
-- ✅ WebSocket サーバー (ポート 8080)
-- ✅ プレイヤーデータ収集 (体力、座標、レベル等)
-- ✅ コマンド実行システム (プレイヤー実行者として)
-- ✅ マルチプラットフォーム対応 (Fabric/Forge/Quilt)
-- ✅ リアルタイムデータ配信
+- Minecraft 1.19.2 or later
+- Java 17 or later
+- One of the following mod loaders:
+  - Fabric Loader 0.14+
+  - Forge 43.2+
+  - Quilt Loader 0.17+
 
-### StreamDeck Plugin
-- ✅ 統合プレイヤー監視アクション (体力/レベル/座標)
-- ✅ カスタマイズ可能な表示形式 (`{health}`, `{level}`, `{x}` 等)
-- ✅ 多言語対応 (日本語・英語)
-- ✅ コマンド実行アクション
-- ✅ 自動再接続機能
-- ✅ プレイヤー指定機能
+### Stream Deck Plugin
+- Windows 10/11 (x64)
+- Elgato Stream Deck Software 6.0+
+- .NET 6.0 Runtime
+- Elgato Stream Deck device (any model)
 
-## 8. 開発ロードマップ (フェーズ別)
+## 🚀 Installation
 
-### フェーズ 1: MVP (Minimum Viable Product) の開発と完成
+### Minecraft Mod Installation
 
-1.  **開発環境のセットアップ**: Architectury + Kotlin (Mod) および C# (.NET) + Kotlin (JVM) (Plugin) の開発環境をセットアップ。
-2.  **WebSocket 通信の確立**: Mod 側の WebSocket サーバーと Plugin 側の WebSocket クライアントの最小限の実装。
-3.  **最初のデータ連携**: Mod から**プレイヤーのヘルス情報**を取得し、Plugin へ送信、StreamDeck にテキスト表示。
-4.  **最初のコマンド実行**: StreamDeck ボタンから**簡単な Minecraft コマンド**を Mod へ送信し、実行。
-5.  **接続管理とフィードバック**: WebSocket 接続状態の表示、Plugin 側の再接続ロジックを実装。
+1. **Download the mod JAR** for your mod loader from [Releases](../../releases)
+2. **Install your mod loader** (Fabric/Forge/Quilt) if not already installed
+3. **Place the JAR file** in your `mods` folder
+4. **Start Minecraft** - the mod will automatically start the WebSocket server on port 8080
+
+### Stream Deck Plugin Installation
+
+1. **Download** `CraftDeck.streamDeckPlugin` from [Releases](../../releases)
+2. **Double-click** the file to install it automatically
+3. **Add the CraftDeck action** to any Stream Deck key
+4. **Configure connection settings** in the property inspector if needed
+
+## 🔧 Configuration
+
+### Minecraft Mod Configuration
+The mod will create a configuration file at `config/craftdeck.json`:
+
+```json
+{
+  "port": 8080,
+  "host": "localhost",
+  "enableLogging": true,
+  "updateInterval": 1000
+}
+```
+
+### Stream Deck Plugin Configuration
+Configure each Stream Deck key through the property inspector:
+
+- **Connection Settings**: Server host and port
+- **Display Options**: Choose what game data to show
+- **Command Settings**: Set up custom Minecraft commands
+- **Update Frequency**: Control how often data refreshes
+
+## 📡 Communication Protocol
+
+CraftDeck uses WebSocket communication with JSON messages:
+
+### Game Data Messages (Mod → Plugin)
+```json
+{
+  "type": "player_status",
+  "data": {
+    "health": 20,
+    "food": 20,
+    "experience": 1250,
+    "level": 30,
+    "gameMode": "SURVIVAL",
+    "position": {
+      "x": 125.5,
+      "y": 64.0,
+      "z": -89.2,
+      "dimension": "minecraft:overworld"
+    }
+  }
+}
+```
+
+### Command Messages (Plugin → Mod)
+```json
+{
+  "type": "execute_command",
+  "data": {
+    "command": "time set day",
+    "requireOp": true
+  }
+}
+```
+
+## 🛠️ Development
+
+### Building from Source
+
+#### Minecraft Mod
+```bash
+cd craftdeck-mod
+./gradlew build
+```
+
+#### Stream Deck Plugin
+```bash
+cd craftdeck-plugin
+dotnet build -c Release
+```
+
+### Development Setup
+See our [Developer Guide](../../wiki/Developer-Guide) for detailed setup instructions.
+
+## 🤝 Contributing
+
+We welcome contributions! Please see our [Contributing Guidelines](CONTRIBUTING.md) for details on:
+
+- Code style and conventions
+- Submitting bug reports
+- Proposing new features
+- Creating pull requests
+
+## 📄 License
+
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+
+## 🐛 Issue Reporting
+
+Found a bug or have a feature request? Please check our [issue tracker](../../issues) and create a new issue if needed.
+
+## 🔗 Links
+
+- **Documentation**: [GitHub Wiki](../../wiki)
+- **Releases**: [Latest Downloads](../../releases)
+- **Issue Tracker**: [Report Bugs](../../issues)
+- **Discussions**: [Community Forum](../../discussions)
+
+## ⭐ Support
+
+If you find CraftDeck useful, please consider:
+- ⭐ Starring this repository
+- 🐛 Reporting bugs and suggesting improvements
+- 🤝 Contributing code or documentation
+- 💬 Sharing with the Minecraft and Stream Deck communities
+
+---
+
+**Made with ❤️ for the Minecraft and Stream Deck communities**
