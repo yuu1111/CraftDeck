@@ -47,14 +47,70 @@
 # StreamDeck Plugin specific ignores
 streamdeck-plugin/bin/
 streamdeck-plugin/obj/
+streamdeck-plugin/publish/
+!streamdeck-plugin/*.streamDeckPlugin
 
-# Minecraft Mod specific ignores
-minecraft-mod/build/
-minecraft-mod/.gradle/
-minecraft-mod/*.jar
-minecraft-mod/*.zip
-minecraft-mod/*.log
+# Minecraft mod specific ignores
+craftdeck-mod/*/build/
+craftdeck-mod/*/run/
+craftdeck-mod/*/.gradle/
+craftdeck-mod/build/
+craftdeck-mod/.gradle/
+craftdeck-mod/run/
+!craftdeck-mod/gradle/wrapper/gradle-wrapper.jar
 
-#Add
-CraftDeck.streamDeckPlugin
-nul
+# Wiki repository (separate git repo)
+wiki/
+
+# Claude Code local settings
+.claude/settings.local.json
+
+# IDEs
+.idea/
+.vscode/
+*.iml
+*.code-workspace
+
+# OS-specific
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+$RECYCLE.BIN/
+.directory
+
+# Temporary files
+*.tmp
+*.temp
+*.cache
+~$*
+
+# Logs
+logs/
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+lerna-debug.log*
+
+# Package files
+*.7z
+*.dmg
+*.gz
+*.iso
+*.jar
+*.rar
+*.tar
+*.zip
+
+# Backup files
+*.backup
+*.bak
+*.old
+*~
+
+# Build outputs
+out/
+dist/
+publish/
+release/
+releases/
