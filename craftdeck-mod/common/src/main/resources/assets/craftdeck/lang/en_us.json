@@ -16,11 +16,11 @@
   "craftdeck.websocket.error": "WebSocket error occurred",
   "craftdeck.mod.initializing": "Initializing CraftDeck Mod",
   "craftdeck.mod.ready": "CraftDeck is ready",
-  
+
   "craftdeck.status.connected": "Connected to CraftDeck",
   "craftdeck.status.disconnected": "Disconnected from CraftDeck",
   "craftdeck.status.waiting": "Waiting for CraftDeck connection",
-  
+
   "craftdeck.config.port": "WebSocket Port",
   "craftdeck.config.auto_connect": "Auto Connect",
   "craftdeck.config.language": "Client Language"

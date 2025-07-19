@@ -44,7 +44,7 @@ namespace CraftDeck.StreamDeckPlugin.Services
                     {
                         var content = File.ReadAllText(filePath);
                         var langData = JObject.Parse(content);
-                        
+
                         // Localizationセクションを取得（StreamDeck用の構造）
                         if (langData["Localization"] != null)
                         {
@@ -55,7 +55,7 @@ namespace CraftDeck.StreamDeckPlugin.Services
                             // 直接言語データとして使用
                             _localizationData[lang] = langData;
                         }
-                        
+
                         Console.WriteLine($"Loaded localization for: {lang}");
                     }
                     else
@@ -296,17 +296,17 @@ namespace CraftDeck.StreamDeckPlugin.Services
             public static string SettingsSaved => Get("StatusMessages.SettingsSaved");
             public static string AutoConnectEnabled => Get("StatusMessages.AutoConnectEnabled");
             public static string AutoConnectDisabled => Get("StatusMessages.AutoConnectDisabled");
-            
+
             /// <summary>
             /// プレイヤー参加メッセージを取得（プレイヤー名を含む）
             /// </summary>
-            public static string PlayerJoined(string playerName) => 
+            public static string PlayerJoined(string playerName) =>
                 Get("StatusMessages.PlayerJoined", new Dictionary<string, string> { {"playerName", playerName} });
-            
+
             /// <summary>
             /// プレイヤー退出メッセージを取得（プレイヤー名を含む）
             /// </summary>
-            public static string PlayerLeft(string playerName) => 
+            public static string PlayerLeft(string playerName) =>
                 Get("StatusMessages.PlayerLeft", new Dictionary<string, string> { {"playerName", playerName} });
         }
     }

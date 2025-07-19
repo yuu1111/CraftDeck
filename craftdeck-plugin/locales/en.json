@@ -51,7 +51,7 @@
   "ConnectionStates": {
     "WaitingForMinecraft": "Waiting for Minecraft...",
     "Connected": "Connected",
-    "Disconnected": "Disconnected", 
+    "Disconnected": "Disconnected",
     "Connecting": "Connecting...",
     "ConnectionFailed": "Connection Failed",
     "Reconnecting": "Reconnecting...",
@@ -79,7 +79,7 @@
     "craftdeck.server.started": "CraftDeck server started on port %s",
     "craftdeck.server.stopped": "CraftDeck server stopped",
     "craftdeck.player.joined": "Player joined: %s",
-    "craftdeck.player.left": "Player left: %s", 
+    "craftdeck.player.left": "Player left: %s",
     "craftdeck.command.success": "Command executed successfully",
     "craftdeck.command.failed": "Command execution failed: %s",
     "craftdeck.status.connected": "Connected to CraftDeck",

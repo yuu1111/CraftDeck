@@ -4,14 +4,14 @@ import net.minecraft.network.chat.Component
 
 /**
  * CraftDeck正規多言語化システム
- * 
+ *
  * Minecraft標準の多言語化制約に準拠:
  * - サーバーログ: 英語固定（管理者向け）
  * - ゲーム内メッセージ: Component.translatable()使用（プレイヤーのクライアント言語で表示）
  * - WebSocket通信: 翻訳キー送信（StreamDeck Plugin側で翻訳）
  */
 object CraftDeckLocalization {
-    
+
     /**
      * サーバーログ用メッセージ（英語固定）
      * サーバー管理者向けのログは常に英語で統一
@@ -30,7 +30,7 @@ object CraftDeckLocalization {
         fun connectionClosed(address: String) = "Closed connection to $address"
         fun connectionRejected(address: String) = "Connection rejected from $address: not in allowed clients"
         fun commandReceived(command: String) = "Received command execution request: $command"
-        fun commandExecuting(command: String, player: String?) = 
+        fun commandExecuting(command: String, player: String?) =
             "Executing command '$command' for player: ${player ?: "console"}"
         fun commandSuccess() = "Command executed successfully"
         fun commandFailed(error: String) = "Command execution failed: $error"
@@ -46,57 +46,57 @@ object CraftDeckLocalization {
         fun invalidLanguage(language: String) = "Invalid language code: $language. Valid codes: en, ja"
         fun invalidInterval(interval: Int) = "Invalid update interval: $interval. Must be between 1-200 ticks"
     }
-    
+
     /**
      * ゲーム内メッセージ用（Component.translatable使用）
      * プレイヤーのクライアント言語設定で自動翻訳される
      */
     object GameMessage {
-        fun serverStarted(port: Int): Component = 
+        fun serverStarted(port: Int): Component =
             Component.translatable("craftdeck.server.started", port)
-        
-        fun serverStopped(): Component = 
+
+        fun serverStopped(): Component =
             Component.translatable("craftdeck.server.stopped")
-        
-        fun playerJoined(player: String): Component = 
+
+        fun playerJoined(player: String): Component =
             Component.translatable("craftdeck.player.joined", player)
-        
-        fun playerLeft(player: String): Component = 
+
+        fun playerLeft(player: String): Component =
             Component.translatable("craftdeck.player.left", player)
-        
-        fun commandSuccess(): Component = 
+
+        fun commandSuccess(): Component =
             Component.translatable("craftdeck.command.success")
-        
-        fun commandFailed(error: String): Component = 
+
+        fun commandFailed(error: String): Component =
             Component.translatable("craftdeck.command.failed", error)
-        
+
         fun connectionStatus(connected: Boolean): Component = when (connected) {
             true -> Component.translatable("craftdeck.status.connected")
             false -> Component.translatable("craftdeck.status.disconnected")
         }
-        
-        fun configReloaded(): Component = 
+
+        fun configReloaded(): Component =
             Component.translatable("craftdeck.config.reloaded")
-        
-        fun configPortChanged(port: Int): Component = 
+
+        fun configPortChanged(port: Int): Component =
             Component.translatable("craftdeck.config.port_changed", port)
-        
-        fun configLanguageChanged(language: String): Component = 
+
+        fun configLanguageChanged(language: String): Component =
             Component.translatable("craftdeck.config.language_changed", language)
-        
-        fun configIntervalChanged(interval: Int): Component = 
+
+        fun configIntervalChanged(interval: Int): Component =
             Component.translatable("craftdeck.config.interval_changed", interval)
-        
-        fun configInvalidPort(port: Int): Component = 
+
+        fun configInvalidPort(port: Int): Component =
             Component.translatable("craftdeck.config.invalid_port", port)
-        
-        fun configInvalidLanguage(language: String): Component = 
+
+        fun configInvalidLanguage(language: String): Component =
             Component.translatable("craftdeck.config.invalid_language", language)
-        
-        fun configInvalidInterval(interval: Int): Component = 
+
+        fun configInvalidInterval(interval: Int): Component =
             Component.translatable("craftdeck.config.invalid_interval", interval)
     }
-    
+
     /**
      * WebSocket通信用翻訳キー
      * StreamDeck Plugin側で各言語に翻訳される
@@ -113,7 +113,7 @@ object CraftDeckLocalization {
         const val STATUS_WAITING = "craftdeck.status.waiting"
         const val CONNECTION_WELCOME = "craftdeck.connection.welcome"
     }
-    
+
     /**
      * WebSocket JSONメッセージ生成
      * 翻訳キーとパラメータを含むメッセージを生成
@@ -127,7 +127,7 @@ object CraftDeckLocalization {
             append(""""params":{"player":"$player"}""")
             append("}")
         }
-        
+
         fun playerLeft(player: String, uuid: String): String = buildString {
             append("""{"type":"player_leave",""")
             append(""""player":"$player",""")
@@ -136,7 +136,7 @@ object CraftDeckLocalization {
             append(""""params":{"player":"$player"}""")
             append("}")
         }
-        
+
         fun commandResult(success: Boolean, message: String): String = buildString {
             append("""{"type":"command_result",""")
             append(""""success":$success,""")
@@ -147,14 +147,14 @@ object CraftDeckLocalization {
             }
             append("}")
         }
-        
+
         fun connectionStatus(connected: Boolean): String = buildString {
             append("""{"type":"connection_status",""")
             append(""""connected":$connected,""")
             append(""""translation_key":"${if (connected) TranslationKeys.STATUS_CONNECTED else TranslationKeys.STATUS_DISCONNECTED}"""")
             append("}")
         }
-        
+
         fun welcome(): String = buildString {
             append("""{"type":"connection",""")
             append(""""status":"connected",""")
@@ -163,7 +163,7 @@ object CraftDeckLocalization {
             append("}")
         }
     }
-    
+
     /**
      * StreamDeck Plugin側で使用される翻訳マッピング
      * この情報をPlugin側の言語ファイルに反映する

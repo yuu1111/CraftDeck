@@ -2,14 +2,14 @@ package com.craftdeck.common
 
 /**
  * CraftDeck多言語化システム（Config対応版）
- * 
+ *
  * 設計方針:
  * - サーバーログ: Config設定言語（管理者向け）
  * - クライアント通信: クライアント言語設定（ユーザー向け）
  * - 将来のサーバーサイド対応: 英語固定ログ + 設定可能な通信メッセージ
  */
 object LocalizationSystem {
-    
+
     /**
      * サーバー言語を取得（Config設定から）
      */
@@ -26,7 +26,7 @@ object LocalizationSystem {
             "en" // Config未初期化時のフォールバック
         }
     }
-    
+
     // 多言語化されたメッセージマップ
     private val messages = mapOf(
         "en" to mapOf(
@@ -88,7 +88,7 @@ object LocalizationSystem {
             "config.invalid_interval" to "無効な更新間隔です: {interval}。1-200ティックの範囲で指定してください"
         )
     )
-    
+
     /**
      * サーバー用メッセージを取得（Config設定言語で）
      * @param key メッセージキー
@@ -98,7 +98,7 @@ object LocalizationSystem {
     fun getServerMessage(key: String, vararg params: Pair<String, Any>): String {
         return getMessage(getServerLanguage(), key, *params)
     }
-    
+
     /**
      * クライアント用メッセージを取得（指定言語で）
      * @param clientLanguage クライアント言語
@@ -114,22 +114,22 @@ object LocalizationSystem {
         }
         return getMessage(normalizedLang, key, *params)
     }
-    
+
     /**
      * 指定言語のメッセージを取得
      */
     private fun getMessage(language: String, key: String, vararg params: Pair<String, Any>): String {
         val languageMessages = messages[language] ?: messages["en"]!!
         var message = languageMessages[key] ?: key
-        
+
         // プレースホルダーを置換
         for ((placeholder, value) in params) {
             message = message.replace("{$placeholder}", value.toString())
         }
-        
+
         return message
     }
-    
+
     /**
      * サーバーログ用メッセージ（Config言語設定対応）
      */
@@ -147,7 +147,7 @@ object LocalizationSystem {
         fun connectionClosed(address: String) = getServerMessage("connection.closed", "address" to address)
         fun connectionRejected(address: String) = getServerMessage("connection.rejected", "address" to address)
         fun commandReceived(command: String) = getServerMessage("command.received", "command" to command)
-        fun commandExecuting(command: String, player: String?) = 
+        fun commandExecuting(command: String, player: String?) =
             getServerMessage("command.executing", "command" to command, "player" to (player ?: "console"))
         fun commandSuccess() = getServerMessage("command.success")
         fun commandFailed(error: String) = getServerMessage("command.failed", "error" to error)
@@ -163,7 +163,7 @@ object LocalizationSystem {
         fun invalidLanguage(language: String) = getServerMessage("config.invalid_language", "language" to language)
         fun invalidInterval(interval: Int) = getServerMessage("config.invalid_interval", "interval" to interval)
     }
-    
+
     /**
      * クライアント通信用メッセージ（指定言語対応）
      */
@@ -177,12 +177,12 @@ object LocalizationSystem {
             false -> "Welcome to CraftDeck"
         }
     }
-    
+
     /**
      * 対応言語一覧を取得
      */
     fun getSupportedLanguages(): Set<String> = messages.keys
-    
+
     /**
      * 現在のサーバー言語設定を取得
      */

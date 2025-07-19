@@ -107,7 +107,7 @@ namespace CraftDeck.StreamDeckPlugin.Actions
 
         public void OnCommandResultReceived(CommandResultMessage result)
         {
-            var message = result.Success 
+            var message = result.Success
                 ? LocalizationService.StatusMessages.CommandExecuted
                 : LocalizationService.ErrorMessages.CommandExecutionFailed;
             Console.WriteLine($"{message}: {result.Message}");
