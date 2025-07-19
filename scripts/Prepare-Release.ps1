@@ -28,6 +28,7 @@ $ProjectRoot = Split-Path -Parent $ScriptDir
 # Validate version format (semantic versioning)
 if ($Version -notmatch '^\d+\.\d+\.\d+(-\w+)?$') {
     Write-Host "Error: Version must follow semantic versioning (e.g., 1.0.0 or 1.0.0-beta)" -ForegroundColor Red
+    Read-Host
     exit 1
 }
 
@@ -209,6 +210,7 @@ Co-Authored-By: Claude <noreply@anthropic.com>"
 
 } catch {
     Write-Host "`nError: $($_.Exception.Message)" -ForegroundColor Red
+    Read-Host
     exit 1
 } finally {
     Set-Location $ProjectRoot

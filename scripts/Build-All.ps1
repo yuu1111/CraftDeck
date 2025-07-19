@@ -290,9 +290,11 @@ function Main {
     if ($success) {
         Write-Host "`n🎉 All builds completed successfully!" -ForegroundColor Green
         Show-BuildArtifacts
+        Read-Host
         exit 0
     } else {
         Write-Host "`n💥 Build failed!" -ForegroundColor Red
+        Read-Host
         exit 1
     }
 }

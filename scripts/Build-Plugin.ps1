@@ -290,6 +290,7 @@ function Main {
 
     # Validate environment
     if (-not (Test-BuildEnvironment)) {
+        Read-Host
         exit 1
     }
 
@@ -299,6 +300,7 @@ function Main {
     if ($Clean) {
         $success = Invoke-Clean
         if (-not $success) {
+            Read-Host
             exit 1
         }
     }
@@ -306,6 +308,7 @@ function Main {
     # Build/publish
     $success = Build-Plugin
     if (-not $success) {
+        Read-Host
         exit 1
     }
 
@@ -326,9 +329,11 @@ function Main {
 
     if ($success) {
         Write-Host "🎉 Plugin build completed successfully!" -ForegroundColor Green
+        Read-Host
         exit 0
     } else {
         Write-Host "💥 Plugin build failed!" -ForegroundColor Red
+        Read-Host
         exit 1
     }
 }

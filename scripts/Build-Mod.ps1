@@ -57,20 +57,21 @@ Write-Host ""
 # Select Java environment
 function Select-JavaEnvironment {
     Write-Host "🔍 Detecting Java installations..." -ForegroundColor Cyan
-    
+
     $javaInstalls = @()
-    
+
     # Check PATH first
     try {
         $pathJava = Get-Command java -ErrorAction SilentlyContinue
         if ($pathJava) {
-            $version = & java -version 2>&1 | Select-Object -First 1
+            $versionOutput = & java -version 2>&1 | Select-Object -First 1
+            $version = $versionOutput.ToString().Trim()
             if ($version -match 'version "(\d+)') {
                 $majorVersion = [int]$matches[1]
                 $javaInstalls += @{
                     Path = Split-Path $pathJava.Source
                     Executable = $pathJava.Source
-                    Version = $version.Trim()
+                    Version = $version
                     MajorVersion = $majorVersion
                 }
             }
@@ -78,28 +79,29 @@ function Select-JavaEnvironment {
     } catch {
         # Continue with directory search
     }
-    
+
     # Search common Java installation paths
     $searchPaths = @(
         "C:\Program Files\Zulu\*\bin\java.exe",
-        "C:\Program Files\Microsoft\*\bin\java.exe", 
+        "C:\Program Files\Microsoft\*\bin\java.exe",
         "C:\Program Files\Java\*\bin\java.exe",
         "C:\Program Files\Eclipse Adoptium\*\bin\java.exe",
         "C:\Program Files\OpenJDK\*\bin\java.exe",
         "C:\Program Files (x86)\Java\*\bin\java.exe"
     )
-    
+
     foreach ($path in $searchPaths) {
         $found = Get-ChildItem -Path $path -ErrorAction SilentlyContinue
         foreach ($java in $found) {
             try {
-                $version = & $java.FullName -version 2>&1 | Select-Object -First 1
+                $versionOutput = & $java.FullName -version 2>&1 | Select-Object -First 1
+                $version = $versionOutput.ToString().Trim()
                 if ($version -match 'version "(\d+)') {
                     $majorVersion = [int]$matches[1]
                     $javaInstalls += @{
                         Path = $java.DirectoryName
                         Executable = $java.FullName
-                        Version = $version.Trim()
+                        Version = $version
                         MajorVersion = $majorVersion
                     }
                 }
@@ -108,21 +110,21 @@ function Select-JavaEnvironment {
             }
         }
     }
-    
+
     # Remove duplicates and sort by version
     $javaInstalls = $javaInstalls | Sort-Object @{Expression={$_.MajorVersion}; Descending=$true} | Group-Object Path | ForEach-Object { $_.Group[0] }
-    
+
     if ($javaInstalls.Count -eq 0) {
         Write-Host "❌ No Java installations found" -ForegroundColor Red
         return $null
     }
-    
+
     if ($javaInstalls.Count -eq 1) {
         $selectedJava = $javaInstalls[0]
         Write-Host "   ✅ Found Java: $($selectedJava.Version)" -ForegroundColor Gray
         return $selectedJava
     }
-    
+
     # Multiple Java installations found - let user choose
     Write-Host "`n📋 Multiple Java installations detected:" -ForegroundColor Yellow
     for ($i = 0; $i -lt $javaInstalls.Count; $i++) {
@@ -130,11 +132,11 @@ function Select-JavaEnvironment {
         Write-Host "   [$($i + 1)] $($java.Version)" -ForegroundColor Gray
         Write-Host "       Path: $($java.Path)" -ForegroundColor DarkGray
     }
-    
+
     do {
         Write-Host "`nJava環境を選択してください (1-$($javaInstalls.Count)): " -ForegroundColor Cyan -NoNewline
         $selection = Read-Host
-        
+
         if ($selection -match '^\d+$') {
             $index = [int]$selection - 1
             if ($index -ge 0 -and $index -lt $javaInstalls.Count) {

@@ -1,14 +1,11 @@
 #!/usr/bin/env pwsh
 <#
 .SYNOPSIS
-    CraftDeck Project Deployment Script
+    CraftDeck StreamDeck Plugin Deployment Script
 
 .DESCRIPTION
-    Unified deployment script for both Minecraft Mod and StreamDeck Plugin components.
-    Builds and deploys the complete CraftDeck system.
-
-.PARAMETER Component
-    Component to deploy: Mod, Plugin, or All (default: All)
+    Builds and deploys the CraftDeck StreamDeck Plugin.
+    Automatically handles building, testing, and deployment to StreamDeck.
 
 .PARAMETER Configuration
     Build configuration: Debug or Release (default: Release)
@@ -21,17 +18,14 @@
 
 .EXAMPLE
     .\Deploy-Plugin.ps1
-    .\Deploy-Plugin.ps1 -Component Plugin -Configuration Debug
-    .\Deploy-Plugin.ps1 -Component Mod
-    .\Deploy-Plugin.ps1 -Component All -SkipStreamDeckRestart
+    .\Deploy-Plugin.ps1 -Configuration Debug
+    .\Deploy-Plugin.ps1 -SkipStreamDeckRestart
+    .\Deploy-Plugin.ps1 -SkipTests
 
 #>
 
 [CmdletBinding()]
 param(
-    [ValidateSet("Mod", "Plugin", "All")]
-    [string]$Component = "All",
-
     [ValidateSet("Debug", "Release")]
     [string]$Configuration = "Release",
 
@@ -43,7 +37,6 @@ param(
 # Script configuration
 $ErrorActionPreference = "Stop"
 $scriptRoot = Split-Path -Parent $PSScriptRoot
-$modPath = Join-Path $scriptRoot "craftdeck-mod"
 $pluginPath = Join-Path $scriptRoot "craftdeck-plugin"
 
 # Platform detection
@@ -91,35 +84,6 @@ function Get-StreamDeckConfig {
         default {
             throw "Unsupported platform: $platform"
         }
-    }
-}
-
-# Build Minecraft Mod
-function Build-MinecraftMod {
-    Write-Host "🔨 Building Minecraft Mod..." -ForegroundColor Cyan
-
-    if (-not (Test-Path $modPath)) {
-        Write-Host "❌ Mod directory not found: $modPath" -ForegroundColor Red
-        return $false
-    }
-
-    try {
-        Push-Location $modPath
-
-        Write-Host "   Running Gradle build..." -ForegroundColor Gray
-        if ($IsWindows) {
-            .\gradlew.bat build
-        } else {
-            ./gradlew build
-        }
-
-        Write-Host "✅ Minecraft Mod built successfully" -ForegroundColor Green
-        return $true
-    } catch {
-        Write-Host "❌ Minecraft Mod build failed: $($_.Exception.Message)" -ForegroundColor Red
-        return $false
-    } finally {
-        Pop-Location
     }
 }
 
@@ -277,85 +241,39 @@ function Invoke-Tests {
     }
 }
 
-# Display mod build artifacts
-function Show-ModArtifacts {
-    Write-Host "📁 Minecraft Mod Artifacts:" -ForegroundColor Cyan
-
-    $fabricJar = Join-Path $modPath "fabric\build\libs"
-    $forgeJar = Join-Path $modPath "forge\build\libs"
-    $quiltJar = Join-Path $modPath "quilt\build\libs"
-
-    foreach ($path in @($fabricJar, $forgeJar, $quiltJar)) {
-        if (Test-Path $path) {
-            $jars = Get-ChildItem $path -Filter "*.jar" | Where-Object { -not $_.Name.Contains("sources") }
-            foreach ($jar in $jars) {
-                $platform = Split-Path (Split-Path $path -Parent) -Leaf
-                Write-Host "   $platform`: $($jar.FullName)" -ForegroundColor Gray
-            }
-        }
-    }
-}
-
 # Main execution
 function Main {
-    Write-Host "🎮 CraftDeck Project Deployment" -ForegroundColor Magenta
-    Write-Host "==============================`n" -ForegroundColor Magenta
+    Write-Host "🎮 CraftDeck StreamDeck Plugin Deployment" -ForegroundColor Magenta
+    Write-Host "=========================================`n" -ForegroundColor Magenta
 
     $platform = Get-Platform
     $config = Get-StreamDeckConfig
 
     Write-Host "Platform: $platform" -ForegroundColor Gray
-    Write-Host "Component: $Component" -ForegroundColor Gray
     Write-Host "Configuration: $Configuration`n" -ForegroundColor Gray
 
     $success = $true
 
-    # Deploy components based on selection
-    switch ($Component) {
-        "Mod" {
-            $success = Build-MinecraftMod
-            if ($success) { Show-ModArtifacts }
-        }
-        "Plugin" {
-            $success = Build-StreamDeckPlugin -Config $config
-            if ($success) { $success = Invoke-Tests }
-            if ($success) { $success = Deploy-StreamDeckPlugin -Config $config }
-            if ($success) { Start-StreamDeck -Config $config }
-        }
-        "All" {
-            # Build Minecraft Mod
-            $success = Build-MinecraftMod
-            if ($success) { Show-ModArtifacts }
-
-            # Build and deploy StreamDeck Plugin
-            if ($success) { $success = Build-StreamDeckPlugin -Config $config }
-            if ($success) { $success = Invoke-Tests }
-            if ($success) { $success = Deploy-StreamDeckPlugin -Config $config }
-            if ($success) { Start-StreamDeck -Config $config }
-        }
-    }
+    # Build and deploy plugin
+    $success = Build-StreamDeckPlugin -Config $config
+    if ($success) { $success = Invoke-Tests }
+    if ($success) { $success = Deploy-StreamDeckPlugin -Config $config }
+    if ($success) { Start-StreamDeck -Config $config }
 
     Write-Host ""
     if ($success) {
-        Write-Host "🎉 Deployment completed successfully!" -ForegroundColor Green
+        Write-Host "🎉 Plugin deployment completed successfully!" -ForegroundColor Green
 
-        if ($Component -eq "All" -or $Component -eq "Mod") {
-            Write-Host "`nNext steps for Minecraft Mod:" -ForegroundColor Yellow
-            Write-Host "1. Copy the appropriate JAR file to your Minecraft mods folder" -ForegroundColor Gray
-            Write-Host "2. Ensure you have the correct mod loader (Fabric/Forge/Quilt)" -ForegroundColor Gray
-            Write-Host "3. Start Minecraft and verify the mod loads correctly" -ForegroundColor Gray
-        }
+        Write-Host "`nNext steps:" -ForegroundColor Yellow
+        Write-Host "1. Open StreamDeck application" -ForegroundColor Gray
+        Write-Host "2. Add CraftDeck actions to your Stream Deck" -ForegroundColor Gray
+        Write-Host "3. Configure WebSocket connection (default: ws://localhost:8080)" -ForegroundColor Gray
 
-        if ($Component -eq "All" -or $Component -eq "Plugin") {
-            Write-Host "`nNext steps for StreamDeck Plugin:" -ForegroundColor Yellow
-            Write-Host "1. Open StreamDeck application" -ForegroundColor Gray
-            Write-Host "2. Add CraftDeck actions to your Stream Deck" -ForegroundColor Gray
-            Write-Host "3. Configure WebSocket connection (default: ws://localhost:8080)" -ForegroundColor Gray
-        }
-
+        Read-Host
         exit 0
     } else {
-        Write-Host "💥 Deployment failed!" -ForegroundColor Red
+        Write-Host "💥 Plugin deployment failed!" -ForegroundColor Red
+        Read-Host
         exit 1
     }
 }

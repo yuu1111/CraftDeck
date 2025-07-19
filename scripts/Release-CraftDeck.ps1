@@ -195,6 +195,7 @@ try {
 
 } catch {
     Write-Host "`nError: $($_.Exception.Message)" -ForegroundColor Red
+    Read-Host
     exit 1
 } finally {
     Set-Location $ProjectRoot
