@@ -24,7 +24,10 @@
       "Bash(find:*)",
       "Bash(cmd:*)",
       "Bash(wsl:*)",
-      "Bash(java:*)"
+      "Bash(java:*)",
+      "Bash(where java)",
+      "Bash(echo $JAVA_HOME)",
+      "Bash(Remove-Item \"C:\\Dev\\CraftDeck\\test-java-detection.ps1\")"
     ],
     "deny": []
   }
