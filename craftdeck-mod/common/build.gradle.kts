@@ -13,7 +13,7 @@ dependencies {
     modImplementation("net.fabricmc:fabric-loader:${rootProject.property("fabric_loader_version")}")
     // Remove the next line if you don't want to depend on the API
     modApi("dev.architectury:architectury:${rootProject.property("architectury_version")}")
-    
+
     // WebSocket library - will be included by platform-specific builds
     api("org.java-websocket:Java-WebSocket:1.5.3")
 }

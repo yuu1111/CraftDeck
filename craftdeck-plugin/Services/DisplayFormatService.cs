@@ -10,24 +10,46 @@ namespace CraftDeck.StreamDeckPlugin.Services
         private static readonly Regex PlaceholderRegex = new Regex(@"\{([^}]+)\}", RegexOptions.Compiled);
 
         /// <summary>
-        /// Health用のデフォルトフォーマット
+        /// Health用のデフォルトフォーマットを取得
         /// </summary>
-        public static readonly string DefaultHealthFormat = "❤️ {health}/{maxHealth}";
+        public static string GetDefaultHealthFormat(string language = null)
+        {
+            if (!string.IsNullOrEmpty(language))
+                LocalizationService.SetLanguage(language);
+            return LocalizationService.Health.DefaultFormat;
+        }
 
         /// <summary>
-        /// Position用のデフォルトフォーマット
+        /// Position用のデフォルトフォーマットを取得
         /// </summary>
-        public static readonly string DefaultPositionFormat = "📍 {x}, {y}, {z}";
+        public static string GetDefaultPositionFormat(string language = null)
+        {
+            if (!string.IsNullOrEmpty(language))
+                LocalizationService.SetLanguage(language);
+            return LocalizationService.Position.DefaultFormat;
+        }
 
         /// <summary>
-        /// Level用のデフォルトフォーマット
+        /// Level用のデフォルトフォーマットを取得
         /// </summary>
-        public static readonly string DefaultLevelFormat = "⭐ Lv.{level} ({experience}%)";
+        public static string GetDefaultLevelFormat(string language = null)
+        {
+            if (!string.IsNullOrEmpty(language))
+                LocalizationService.SetLanguage(language);
+            return LocalizationService.Level.DefaultFormat;
+        }
+
+        /// <summary>
+        /// 下位互換性のためのstaticプロパティ
+        /// </summary>
+        public static string DefaultHealthFormat => GetDefaultHealthFormat();
+        public static string DefaultPositionFormat => GetDefaultPositionFormat();
+        public static string DefaultLevelFormat => GetDefaultLevelFormat();
 
         /// <summary>
         /// プレイヤーデータとフォーマット文字列から表示文字列を生成
         /// </summary>
-        public static string FormatPlayerData(string format, PlayerStatusMessage playerData)
+        public static string FormatPlayerData(string format, PlayerStatusMessage playerData, string clientPlayerName = null)
         {
             if (string.IsNullOrEmpty(format) || playerData == null)
                 return "";
@@ -46,7 +68,11 @@ namespace CraftDeck.StreamDeckPlugin.Services
                 ["z"] = () => playerData.Position?.Z.ToString("F0") ?? "0",
                 ["gamemode"] = () => playerData.GameMode,
                 ["dimension"] = () => playerData.Dimension,
-                ["name"] = () => playerData.Name
+                ["name"] = () => playerData.Name,
+                ["playername"] = () => playerData.Name,  // プレイヤー名のエイリアス
+                ["player"] = () => playerData.Name,      // より短いエイリアス
+                ["clientname"] = () => clientPlayerName ?? playerData.Name,  // クライアントプレイヤー名
+                ["client"] = () => clientPlayerName ?? playerData.Name       // より短いクライアント名エイリアス
             };
 
             return PlaceholderRegex.Replace(format, match =>
@@ -59,10 +85,13 @@ namespace CraftDeck.StreamDeckPlugin.Services
         /// <summary>
         /// オフライン時の表示文字列を生成
         /// </summary>
-        public static string FormatOfflineMessage(string format, string defaultIcon = "❓")
+        public static string FormatOfflineMessage(string format, string defaultIcon = "❓", string language = null)
         {
+            if (!string.IsNullOrEmpty(language))
+                LocalizationService.SetLanguage(language);
+
             if (string.IsNullOrEmpty(format))
-                return $"{defaultIcon} Offline";
+                return $"{defaultIcon} {LocalizationService.Common.Offline}";
 
             // プレースホルダーを"--"で置換
             return PlaceholderRegex.Replace(format, "--");
@@ -71,10 +100,13 @@ namespace CraftDeck.StreamDeckPlugin.Services
         /// <summary>
         /// データなし時の表示文字列を生成
         /// </summary>
-        public static string FormatNoDataMessage(string format, string defaultIcon = "❓")
+        public static string FormatNoDataMessage(string format, string defaultIcon = "❓", string language = null)
         {
+            if (!string.IsNullOrEmpty(language))
+                LocalizationService.SetLanguage(language);
+
             if (string.IsNullOrEmpty(format))
-                return $"{defaultIcon} --";
+                return $"{defaultIcon} {LocalizationService.Common.NoData}";
 
             // プレースホルダーを"--"で置換
             return PlaceholderRegex.Replace(format, "--");

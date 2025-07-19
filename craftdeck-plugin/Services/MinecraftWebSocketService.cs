@@ -5,6 +5,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using Newtonsoft.Json;
 using CraftDeck.StreamDeckPlugin.Models;
+using CraftDeck.StreamDeckPlugin.Constants;
 using System.Collections.Concurrent;
 using System.Linq;
 using System.Collections.Generic;
@@ -27,9 +28,9 @@ namespace CraftDeck.StreamDeckPlugin.Services
         public event Action<CommandResultMessage> CommandResultReceived;
         public event Action<string> ErrorReceived;
 
-        public MinecraftWebSocketService(string serverUrl = "ws://localhost:8080")
+        public MinecraftWebSocketService(string serverUrl = null)
         {
-            _serverUrl = serverUrl;
+            _serverUrl = serverUrl ?? AppConstants.WebSocket.DefaultServerUrl;
             _cancellationTokenSource = new CancellationTokenSource();
             _playerData = new ConcurrentDictionary<string, PlayerStatusMessage>();
         }

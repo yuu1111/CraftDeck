@@ -1,0 +1,51 @@
+{
+  "Name": "CraftDeck",
+  "Description": "Integrates Minecraft with StreamDeck for real-time game monitoring and control.",
+  "Category": "CraftDeck",
+  "Actions": {
+    "com.craftdeck.plugin.action.command": {
+      "Name": "Command Executor",
+      "Tooltip": "Execute Minecraft commands"
+    },
+    "com.craftdeck.plugin.action.playerhealth": {
+      "Name": "Player Health Monitor",
+      "Tooltip": "Monitor player health with customizable display format"
+    },
+    "com.craftdeck.plugin.action.playerlevel": {
+      "Name": "Player Level Monitor",
+      "Tooltip": "Monitor player experience level with customizable display format"
+    },
+    "com.craftdeck.plugin.action.playerposition": {
+      "Name": "Player Position Monitor",
+      "Tooltip": "Monitor player coordinates with customizable display format"
+    }
+  },
+  "Localization": {
+    "Player Name": "Player Name",
+    "Server URL": "Server URL",
+    "Auto Connect": "Auto Connect",
+    "Display Format": "Display Format",
+    "Language": "Language",
+    "Command": "Command",
+    "Information": "Information",
+    "Auto detect": "Auto detect",
+    "English": "English",
+    "Japanese": "日本語",
+    "Player Name Help": "Leave empty to monitor the first available player",
+    "Specific Player Help": "Enter specific player name to monitor only that player",
+    "Real-time Updates": "Real-time Updates:",
+    "Health Description": "Shows current/max health with ❤️ icon",
+    "Position Description": "Shows X,Y,Z coordinates with 📍 icon",
+    "Level Description": "Shows experience level with ⭐ icon",
+    "Default Formats": "Default Formats:",
+    "Health Format": "❤️ {health}/{maxHealth}",
+    "Position Format": "📍 {x}, {y}, {z}",
+    "Level Format": "⭐ Lv.{level} ({experience}%)",
+    "Placeholder Examples": "Use placeholders like {health}, {level}, {x}, etc.",
+    "Placeholder Health": "Health: {health}, {maxHealth}, {healthPercent}",
+    "Placeholder Food": "Food: {food}, {foodPercent}",
+    "Placeholder Level": "Level: {level}, {experience}",
+    "Placeholder Position": "Position: {x}, {y}, {z}",
+    "Placeholder Other": "Other: {gamemode}, {dimension}, {name}, {clientname}"
+  }
+}

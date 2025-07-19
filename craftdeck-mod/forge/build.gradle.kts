@@ -47,7 +47,7 @@ dependencies {
 
     // Kotlin For Forge
     implementation("thedarkcolour:kotlinforforge:${rootProject.property("kotlin_for_forge_version")}")
-    
+
     // Include Java-WebSocket in the JAR
     implementation("org.java-websocket:Java-WebSocket:1.5.3")
     forgeRuntimeLibrary("org.java-websocket:Java-WebSocket:1.5.3")

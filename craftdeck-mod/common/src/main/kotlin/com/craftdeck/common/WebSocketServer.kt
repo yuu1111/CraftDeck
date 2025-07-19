@@ -7,9 +7,9 @@ import java.net.InetSocketAddress
 import java.util.concurrent.ConcurrentHashMap
 
 class CraftDeckWebSocketServer(port: Int) : WebSocketServer(InetSocketAddress(port)) {
-    
+
     private val connectedClients = ConcurrentHashMap<WebSocket, String>()
-    
+
     override fun onStart() {
         CraftDeckMod.LOGGER.info("WebSocket server started successfully on port $port")
     }
@@ -18,7 +18,7 @@ class CraftDeckWebSocketServer(port: Int) : WebSocketServer(InetSocketAddress(po
         val clientAddress = conn.remoteSocketAddress.address.hostAddress
         connectedClients[conn] = clientAddress
         CraftDeckMod.LOGGER.info("New connection from $clientAddress")
-        
+
         // Send initial connection confirmation
         val message = """{"type":"connection","status":"connected","message":"Welcome to CraftDeck"}"""
         conn.send(message)
@@ -32,7 +32,7 @@ class CraftDeckWebSocketServer(port: Int) : WebSocketServer(InetSocketAddress(po
     override fun onMessage(conn: WebSocket, message: String) {
         val clientAddress = connectedClients[conn]
         CraftDeckMod.LOGGER.info("Received message from $clientAddress: $message")
-        
+
         try {
             handleMessage(conn, message)
         } catch (e: Exception) {
@@ -45,7 +45,7 @@ class CraftDeckWebSocketServer(port: Int) : WebSocketServer(InetSocketAddress(po
     override fun onError(conn: WebSocket?, ex: Exception) {
         CraftDeckMod.LOGGER.error("WebSocket error", ex)
     }
-    
+
     private fun handleMessage(conn: WebSocket, message: String) {
         try {
             // Parse JSON message (basic parsing for now)
@@ -68,23 +68,28 @@ class CraftDeckWebSocketServer(port: Int) : WebSocketServer(InetSocketAddress(po
             conn.send(errorResponse)
         }
     }
-    
+
     private fun handleCommandExecution(conn: WebSocket, message: String) {
         try {
+            CraftDeckMod.LOGGER.info("Received command execution request: $message")
+
             // Extract command from JSON (basic extraction)
             val commandStart = message.indexOf("\"command\":\"") + 11
             val commandEnd = message.indexOf("\"", commandStart)
             val command = message.substring(commandStart, commandEnd)
-            
+
+            CraftDeckMod.LOGGER.info("Extracted command: '$command'")
+
             // Extract player name if specified
             val playerName = if (message.contains("\"player\":\"")) {
                 val playerStart = message.indexOf("\"player\":\"") + 10
                 val playerEnd = message.indexOf("\"", playerStart)
                 message.substring(playerStart, playerEnd)
             } else null
-            
+
+            CraftDeckMod.LOGGER.info("Executing command '$command' for player: $playerName")
             val result = CommandHandler.executeCommand(command, playerName)
-            
+
             val response = buildString {
                 append("""{"type":"command_result",""")
                 append(""""success":${result.success},""")
@@ -92,7 +97,7 @@ class CraftDeckWebSocketServer(port: Int) : WebSocketServer(InetSocketAddress(po
                 append(""""result":${result.result}""")
                 append("}")
             }
-            
+
             conn.send(response)
         } catch (e: Exception) {
             CraftDeckMod.LOGGER.error("Error executing command", e)
@@ -100,7 +105,7 @@ class CraftDeckWebSocketServer(port: Int) : WebSocketServer(InetSocketAddress(po
             conn.send(errorResponse)
         }
     }
-    
+
     private fun handlePlayerDataRequest(conn: WebSocket) {
         val playerData = GameDataCollector.getPlayerData()
         val response = buildString {
@@ -124,7 +129,7 @@ class CraftDeckWebSocketServer(port: Int) : WebSocketServer(InetSocketAddress(po
         }
         conn.send(response)
     }
-    
+
     fun broadcastToAll(message: String) {
         connectedClients.keys.forEach { conn ->
             try {
@@ -134,6 +139,6 @@ class CraftDeckWebSocketServer(port: Int) : WebSocketServer(InetSocketAddress(po
             }
         }
     }
-    
+
     fun getConnectedClientCount(): Int = connectedClients.size
 }

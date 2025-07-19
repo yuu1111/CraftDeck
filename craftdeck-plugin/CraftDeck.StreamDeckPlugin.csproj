@@ -154,6 +154,14 @@
 		</Content>
 	</ItemGroup>
 
+	<!-- Localization Resources -->
+	<ItemGroup>
+		<EmbeddedResource Include="Resources\Localization.json" />
+		<Content Include="Resources\Localization.json">
+			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+		</Content>
+	</ItemGroup>
+
 	<ItemGroup>
 	  <PackageReference Include="McMaster.Extensions.CommandLineUtils" Version="4.0.1" />
 	  <PackageReference Include="Microsoft.Extensions.Configuration" Version="6.0.0" />

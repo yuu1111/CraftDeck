@@ -1,0 +1,51 @@
+{
+  "Name": "CraftDeck",
+  "Description": "MinecraftとStreamDeckをリアルタイムゲーム監視・制御のために統合します。",
+  "Category": "CraftDeck",
+  "Actions": {
+    "com.craftdeck.plugin.action.command": {
+      "Name": "コマンド実行",
+      "Tooltip": "Minecraftコマンドを実行"
+    },
+    "com.craftdeck.plugin.action.playerhealth": {
+      "Name": "プレイヤー体力監視",
+      "Tooltip": "カスタム表示形式でプレイヤーの体力をリアルタイム監視"
+    },
+    "com.craftdeck.plugin.action.playerlevel": {
+      "Name": "プレイヤーレベル監視",
+      "Tooltip": "カスタム表示形式でプレイヤーの経験値レベルをリアルタイム監視"
+    },
+    "com.craftdeck.plugin.action.playerposition": {
+      "Name": "プレイヤー座標監視",
+      "Tooltip": "カスタム表示形式でプレイヤーの座標をリアルタイム監視"
+    }
+  },
+  "Localization": {
+    "Player Name": "プレイヤー名",
+    "Server URL": "サーバーURL",
+    "Auto Connect": "自動接続",
+    "Display Format": "表示形式",
+    "Language": "言語",
+    "Command": "コマンド",
+    "Information": "情報",
+    "Auto detect": "自動検出",
+    "English": "English",
+    "Japanese": "日本語",
+    "Player Name Help": "空にすると最初の利用可能なプレイヤーを監視します",
+    "Specific Player Help": "特定のプレイヤー名を入力するとそのプレイヤーのみを監視します",
+    "Real-time Updates": "リアルタイム更新:",
+    "Health Description": "❤️ アイコン付きで現在/最大体力を表示",
+    "Position Description": "📍 アイコン付きでX,Y,Z座標を表示",
+    "Level Description": "⭐ アイコン付きで経験値レベルを表示",
+    "Default Formats": "デフォルト形式:",
+    "Health Format": "❤️ {health}/{maxHealth}",
+    "Position Format": "📍 {x}, {y}, {z}",
+    "Level Format": "⭐ Lv.{level} ({experience}%)",
+    "Placeholder Examples": "{health}, {level}, {x} などのプレースホルダーを使用",
+    "Placeholder Health": "体力: {health}, {maxHealth}, {healthPercent}",
+    "Placeholder Food": "満腹度: {food}, {foodPercent}",
+    "Placeholder Level": "レベル: {level}, {experience}",
+    "Placeholder Position": "座標: {x}, {y}, {z}",
+    "Placeholder Other": "その他: {gamemode}, {dimension}, {name}, {clientname}"
+  }
+}

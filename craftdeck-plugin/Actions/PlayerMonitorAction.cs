@@ -5,17 +5,17 @@ using System.Threading.Tasks;
 using System.Timers;
 using CraftDeck.StreamDeckPlugin.Services;
 using CraftDeck.StreamDeckPlugin.Models;
+using CraftDeck.StreamDeckPlugin.Constants;
 
 namespace CraftDeck.StreamDeckPlugin.Actions
 {
-    [ActionUuid(Uuid = "com.craftdeck.plugin.action.playerposition")]
-    public class PlayerPositionAction : BaseStreamDeckActionWithSettingsModel<Models.PlayerMonitorSettingsModel>, IWebSocketClient
+    [ActionUuid(Uuid = AppConstants.Actions.PlayerMonitor)]
+    public class PlayerMonitorAction : BaseStreamDeckActionWithSettingsModel<Models.PlayerMonitorSettingsModel>, IWebSocketClient
     {
         private Timer _updateTimer;
         private PlayerStatusMessage _currentPlayerData;
         private string _clientId;
         private string _currentContext;
-        private string _lastDimension = "";
 
         public override async Task OnWillAppear(StreamDeckEventPayload args)
         {
@@ -27,8 +27,8 @@ namespace CraftDeck.StreamDeckPlugin.Actions
             _clientId = Guid.NewGuid().ToString();
             SharedWebSocketManager.RegisterClient(_clientId, this);
 
-            // Start update timer
-            _updateTimer = new Timer(500); // Update position more frequently
+            // Set update interval (1000ms default)
+            _updateTimer = new Timer(AppConstants.UI.HealthUpdateInterval);
             _updateTimer.Elapsed += async (sender, e) => await UpdateDisplay();
             _updateTimer.Start();
 
@@ -59,6 +59,13 @@ namespace CraftDeck.StreamDeckPlugin.Actions
         public override async Task OnDidReceiveSettings(StreamDeckEventPayload args)
         {
             await base.OnDidReceiveSettings(args);
+
+            // Update language setting if specified
+            if (!string.IsNullOrEmpty(SettingsModel.Language))
+            {
+                LocalizationService.SetLanguage(SettingsModel.Language);
+            }
+
             await UpdateDisplay();
         }
 
@@ -70,46 +77,50 @@ namespace CraftDeck.StreamDeckPlugin.Actions
             {
                 string title;
                 var webSocketService = SharedWebSocketManager.WebSocketService;
-                var displayFormat = string.IsNullOrEmpty(SettingsModel.DisplayFormat) 
-                    ? DisplayFormatService.DefaultPositionFormat 
-                    : SettingsModel.DisplayFormat;
+
+                // Set language before getting display format
+                if (!string.IsNullOrEmpty(SettingsModel.Language))
+                {
+                    LocalizationService.SetLanguage(SettingsModel.Language);
+                }
+
+                var displayFormat = GetDisplayFormat();
+                const string defaultIcon = "🎮";
 
                 if (!webSocketService.IsConnected)
                 {
-                    title = DisplayFormatService.FormatOfflineMessage(displayFormat, "📍");
+                    title = DisplayFormatService.FormatOfflineMessage(displayFormat, defaultIcon, SettingsModel.Language);
                 }
                 else if (_currentPlayerData != null &&
                          (string.IsNullOrEmpty(SettingsModel.PlayerName) ||
                           SettingsModel.PlayerName.Equals(_currentPlayerData.Name, StringComparison.OrdinalIgnoreCase)))
                 {
-                    title = DisplayFormatService.FormatPlayerData(displayFormat, _currentPlayerData);
+                    // クライアントプレイヤー名を取得（設定されていない場合は現在のプレイヤー名を使用）
+                    var clientPlayerName = string.IsNullOrEmpty(SettingsModel.PlayerName)
+                        ? _currentPlayerData.Name
+                        : SettingsModel.PlayerName;
+                    title = DisplayFormatService.FormatPlayerData(displayFormat, _currentPlayerData, clientPlayerName);
                 }
                 else
                 {
-                    title = DisplayFormatService.FormatNoDataMessage(displayFormat, "📍");
+                    title = DisplayFormatService.FormatNoDataMessage(displayFormat, defaultIcon, SettingsModel.Language);
                 }
 
                 await Manager.SetTitleAsync(_currentContext, title);
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"Error updating position display: {ex.Message}");
+                Console.WriteLine($"Error updating player monitor display: {ex.Message}");
             }
         }
 
-        private string GetShortDimensionName(string dimension)
+        private string GetDisplayFormat()
         {
-            if (dimension == null) return "📍";
-            
-            // Extract dimension name from full identifier
-            if (dimension.Contains("overworld"))
-                return "🌍"; // Overworld
-            else if (dimension.Contains("nether"))
-                return "🔥"; // Nether
-            else if (dimension.Contains("end"))
-                return "🌌"; // The End
-            else
-                return "📍"; // Unknown dimension
+            if (!string.IsNullOrEmpty(SettingsModel.DisplayFormat))
+                return SettingsModel.DisplayFormat;
+
+            // デフォルトフォーマット（汎用プレイヤーモニター）
+            return DisplayFormatService.GetDefaultHealthFormat(SettingsModel.Language);
         }
 
         // IWebSocketClient implementation
@@ -126,21 +137,13 @@ namespace CraftDeck.StreamDeckPlugin.Actions
                 SettingsModel.PlayerName.Equals(playerStatus.Name, StringComparison.OrdinalIgnoreCase))
             {
                 _currentPlayerData = playerStatus;
-                
-                // Check if dimension changed
-                if (_lastDimension != playerStatus.Dimension)
-                {
-                    _lastDimension = playerStatus.Dimension;
-                    // Could trigger special effects here for dimension changes
-                }
-                
                 _ = Task.Run(async () => await UpdateDisplay());
             }
         }
 
         public void OnPlayerJoined(PlayerJoinMessage playerJoin)
         {
-            // Not needed for position action
+            // Not needed for player monitor action
         }
 
         public void OnPlayerLeft(PlayerLeaveMessage playerLeave)
@@ -149,19 +152,32 @@ namespace CraftDeck.StreamDeckPlugin.Actions
             if (_currentPlayerData != null && _currentPlayerData.Name.Equals(playerLeave.Player, StringComparison.OrdinalIgnoreCase))
             {
                 _currentPlayerData = null;
-                _lastDimension = "";
                 _ = Task.Run(async () => await UpdateDisplay());
             }
         }
 
         public void OnCommandResultReceived(CommandResultMessage result)
         {
-            // Not needed for position action
+            // Not needed for player monitor action
         }
 
         public void OnErrorReceived(string error)
         {
-            Console.WriteLine($"WebSocket error in position action: {error}");
+            Console.WriteLine($"WebSocket error in {_monitorType} monitor action: {error}");
         }
+    }
+
+    // レベル監視用の別のActionUuid
+    [ActionUuid(Uuid = AppConstants.Actions.PlayerLevel)]
+    public class PlayerLevelMonitorAction : PlayerMonitorAction
+    {
+        // PlayerMonitorActionを継承するだけで、MonitorTypeはアクションUUIDから自動決定される
+    }
+
+    // 座標監視用の別のActionUuid
+    [ActionUuid(Uuid = AppConstants.Actions.PlayerPosition)]
+    public class PlayerPositionMonitorAction : PlayerMonitorAction
+    {
+        // PlayerMonitorActionを継承するだけで、MonitorTypeはアクションUUIDから自動決定される
     }
 }

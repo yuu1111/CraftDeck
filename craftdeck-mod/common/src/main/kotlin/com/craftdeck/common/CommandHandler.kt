@@ -7,20 +7,27 @@ import net.minecraft.world.phys.Vec2
 import net.minecraft.world.phys.Vec3
 
 object CommandHandler {
-    
+
     private var server: MinecraftServer? = null
-    
+    private var isInitialized = false
+
     fun setServer(minecraftServer: MinecraftServer) {
-        server = minecraftServer
-        CraftDeckMod.LOGGER.info("Command handler initialized with server instance")
+        if (!isInitialized) {
+            server = minecraftServer
+            isInitialized = true
+            CraftDeckMod.LOGGER.info("Command handler initialized with server instance")
+        } else {
+            // Just update the server reference without logging
+            server = minecraftServer
+        }
     }
-    
+
     fun executeCommand(command: String, playerName: String? = null): CommandResult {
         val currentServer = server
         if (currentServer == null) {
             return CommandResult(false, "Server not available")
         }
-        
+
         return try {
             val commandSource = if (playerName != null) {
                 // Execute as specific player
@@ -43,17 +50,17 @@ object CommandHandler {
                     createServerCommandSource(currentServer)
                 }
             }
-            
+
             val result = currentServer.commands.performPrefixedCommand(commandSource, command)
             CraftDeckMod.LOGGER.info("Executed command '$command' with result: $result")
-            
+
             CommandResult(true, "Command executed successfully", result)
         } catch (e: Exception) {
             CraftDeckMod.LOGGER.error("Failed to execute command: $command", e)
             CommandResult(false, "Command execution failed: ${e.message}")
         }
     }
-    
+
     private fun createServerCommandSource(server: MinecraftServer): CommandSourceStack {
         return CommandSourceStack(
             server,
@@ -67,7 +74,7 @@ object CommandHandler {
             null
         )
     }
-    
+
     data class CommandResult(
         val success: Boolean,
         val message: String,

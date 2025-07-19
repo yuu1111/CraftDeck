@@ -9,43 +9,52 @@
 <body>
 	<div class="sdpi-wrapper">
 		<div class="sdpi-item">
-			<div class="sdpi-item-label">Player Name</div>
-			<input id="playerName" class="sdpi-item-value" type="text" placeholder="Enter player name to monitor (leave empty for any player)" onchange="setSettings(event.target.value, 'PlayerName')" />
+			<div class="sdpi-item-label" data-localize="Player Name">Player Name</div>
+			<input id="playerName" class="sdpi-item-value" type="text" data-localize-placeholder="Player Name Help" placeholder="Enter player name to monitor (leave empty for any player)" onchange="setSettings(event.target.value, 'PlayerName')" />
 		</div>
 
 		<div class="sdpi-item">
-			<div class="sdpi-item-label">Server URL</div>
+			<div class="sdpi-item-label" data-localize="Server URL">Server URL</div>
 			<input id="serverUrl" class="sdpi-item-value" type="text" placeholder="ws://localhost:8080" onchange="setSettings(event.target.value, 'ServerUrl')" />
 		</div>
 
 		<div class="sdpi-item">
-			<div class="sdpi-item-label">Auto Connect</div>
+			<div class="sdpi-item-label" data-localize="Auto Connect">Auto Connect</div>
 			<input id="autoConnect" class="sdpi-item-value" type="checkbox" onchange="setSettings(event.target.checked, 'AutoConnect')" />
 		</div>
 
 		<div class="sdpi-item">
-			<div class="sdpi-item-label">Display Format</div>
-			<input id="displayFormat" class="sdpi-item-value" type="text" placeholder="Use placeholders like {health}, {level}, {x}, etc." onchange="setSettings(event.target.value, 'DisplayFormat')" />
+			<div class="sdpi-item-label" data-localize="Language">Language / 言語</div>
+			<select id="language" class="sdpi-item-value" onchange="setSettings(event.target.value, 'Language')">
+				<option value="auto" data-localize="Auto detect">Auto detect / 自動検出</option>
+				<option value="en" data-localize="English">English</option>
+				<option value="ja" data-localize="Japanese">日本語</option>
+			</select>
 		</div>
 
 		<div class="sdpi-item">
-			<div class="sdpi-item-label">Information</div>
+			<div class="sdpi-item-label" data-localize="Display Format">Display Format</div>
+			<textarea id="displayFormat" class="sdpi-item-value" rows="2" data-localize-placeholder="Placeholder Examples" placeholder="Use placeholders like {health}, {level}, {x}, etc.&#10;Example: {health}❤️&#10;X:{x}" onchange="setSettings(event.target.value, 'DisplayFormat')" oninput="setSettings(event.target.value, 'DisplayFormat')"></textarea>
+		</div>
+
+		<div class="sdpi-item">
+			<div class="sdpi-item-label" data-localize="Information">Information</div>
 			<div class="sdpi-item-value" style="font-size: 12px; color: #999;">
-				<p><strong>Player Name:</strong></p>
-				<p>• Leave empty to monitor the first available player</p>
-				<p>• Enter specific player name to monitor only that player</p>
+				<p><strong data-localize="Player Name">Player Name:</strong></p>
+				<p>• <span data-localize="Player Name Help">Leave empty to monitor the first available player</span></p>
+				<p>• <span data-localize="Specific Player Help">Enter specific player name to monitor only that player</span></p>
 				<br>
 				<p><strong>Display Format Placeholders:</strong></p>
-				<p>• Health: {health}, {maxHealth}, {healthPercent}</p>
-				<p>• Food: {food}, {foodPercent}</p>
-				<p>• Level: {level}, {experience}</p>
-				<p>• Position: {x}, {y}, {z}</p>
-				<p>• Other: {gamemode}, {dimension}, {name}</p>
+				<p>• <span data-localize="Placeholder Health">Health: {health}, {maxHealth}, {healthPercent}</span></p>
+				<p>• <span data-localize="Placeholder Food">Food: {food}, {foodPercent}</span></p>
+				<p>• <span data-localize="Placeholder Level">Level: {level}, {experience}</span></p>
+				<p>• <span data-localize="Placeholder Position">Position: {x}, {y}, {z}</span></p>
+				<p>• <span data-localize="Placeholder Other">Other: {gamemode}, {dimension}, {name}, {clientname}</span></p>
 				<br>
-				<p><strong>Default Formats:</strong></p>
-				<p>• Health: ❤️ {health}/{maxHealth}</p>
-				<p>• Position: 📍 {x}, {y}, {z}</p>
-				<p>• Level: ⭐ Lv.{level} ({experience}%)</p>
+				<p><strong data-localize="Default Formats">Default Formats:</strong></p>
+				<p>• Health: <span data-localize="Health Format">❤️ {health}/{maxHealth}</span></p>
+				<p>• Position: <span data-localize="Position Format">📍 {x}, {y}, {z}</span></p>
+				<p>• Level: <span data-localize="Level Format">⭐ Lv.{level} ({experience}%)</span></p>
 			</div>
 		</div>
 	</div>

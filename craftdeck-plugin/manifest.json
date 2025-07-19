@@ -1,20 +1,6 @@
 {
   "Actions": [
     {
-      "Icon": "images/actionIcon",
-      "Name": "CraftDeck Multi-Action",
-      "States": [
-        {
-          "Image": "images/actionDefaultImage",
-          "TitleAlignment": "middle",
-          "FontSize": "16"
-        }
-      ],
-      "SupportedInMultiActions": false,
-      "Tooltip": "CraftDeck - Configurable Minecraft integration",
-      "UUID": "com.craftdeck.plugin.action.craftdeckaction"
-    },
-    {
       "Icon": "images/commandIcon",
       "Name": "Command Executor",
       "States": [
@@ -30,48 +16,18 @@
       "PropertyInspectorPath": "property_inspector/command_inspector.html"
     },
     {
-      "Icon": "images/healthIcon",
-      "Name": "Player Health",
+      "Icon": "images/actionIcon",
+      "Name": "Player Monitor",
       "States": [
         {
-          "Image": "images/healthDefaultImage",
+          "Image": "images/actionDefaultImage",
           "TitleAlignment": "middle",
           "FontSize": "14"
         }
       ],
       "SupportedInMultiActions": false,
-      "Tooltip": "Monitor player health in real-time",
-      "UUID": "com.craftdeck.plugin.action.playerhealth",
-      "PropertyInspectorPath": "property_inspector/player_monitor_inspector.html"
-    },
-    {
-      "Icon": "images/positionIcon",
-      "Name": "Player Position",
-      "States": [
-        {
-          "Image": "images/positionDefaultImage",
-          "TitleAlignment": "middle",
-          "FontSize": "12"
-        }
-      ],
-      "SupportedInMultiActions": false,
-      "Tooltip": "Monitor player coordinates in real-time",
-      "UUID": "com.craftdeck.plugin.action.playerposition",
-      "PropertyInspectorPath": "property_inspector/player_monitor_inspector.html"
-    },
-    {
-      "Icon": "images/levelIcon",
-      "Name": "Player Level",
-      "States": [
-        {
-          "Image": "images/levelDefaultImage",
-          "TitleAlignment": "middle",
-          "FontSize": "14"
-        }
-      ],
-      "SupportedInMultiActions": false,
-      "Tooltip": "Monitor player experience level in real-time",
-      "UUID": "com.craftdeck.plugin.action.playerlevel",
+      "Tooltip": "Monitor player status with fully customizable display format",
+      "UUID": "com.craftdeck.plugin.action.playermonitor",
       "PropertyInspectorPath": "property_inspector/player_monitor_inspector.html"
     }
   ],
@@ -89,6 +45,11 @@
   "URL": "https://www.elgato.com/gaming/stream-deck",
   "Version": "1.0",
 	"SDKVersion": 2,
+	"DefaultWindowSize": [500, 650],
+	"Localization": {
+		"en": "en.json",
+		"ja": "ja.json"
+	},
 	"Software": {
 		"MinimumVersion":  "6.4"
 	},

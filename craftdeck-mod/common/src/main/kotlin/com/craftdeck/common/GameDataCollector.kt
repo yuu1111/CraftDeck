@@ -6,11 +6,11 @@ import net.minecraft.server.level.ServerPlayer
 import java.util.concurrent.ConcurrentHashMap
 
 object GameDataCollector {
-    
+
     private val playerData = ConcurrentHashMap<String, PlayerInfo>()
     private var tickCounter = 0
     private const val UPDATE_INTERVAL = 20 // Send updates every second (20 ticks)
-    
+
     data class PlayerInfo(
         val uuid: String,
         val name: String,
@@ -25,60 +25,60 @@ object GameDataCollector {
         val posZ: Double,
         val dimension: String
     )
-    
+
     fun init() {
         // Register event listeners
         PlayerEvent.PLAYER_JOIN.register { player ->
             onPlayerJoin(player)
         }
-        
+
         PlayerEvent.PLAYER_QUIT.register { player ->
             onPlayerLeave(player)
         }
-        
+
         TickEvent.SERVER_POST.register { server ->
-            // Set server reference for command handler on first tick
+            // Set server reference for command handler (only logs once)
             CommandHandler.setServer(server)
             onServerTick(server)
         }
-        
+
         CraftDeckMod.LOGGER.info("GameDataCollector initialized")
     }
-    
+
     private fun onPlayerJoin(player: ServerPlayer) {
         CraftDeckMod.LOGGER.info("Player joined: ${player.name.string}")
         updatePlayerData(player)
-        
+
         val webSocketServer = CraftDeckMod.getWebSocketServer()
         val message = """{"type":"player_join","player":"${player.name.string}","uuid":"${player.stringUUID}"}"""
         webSocketServer?.broadcastToAll(message)
     }
-    
+
     private fun onPlayerLeave(player: ServerPlayer) {
         CraftDeckMod.LOGGER.info("Player left: ${player.name.string}")
         playerData.remove(player.stringUUID)
-        
+
         val webSocketServer = CraftDeckMod.getWebSocketServer()
         val message = """{"type":"player_leave","player":"${player.name.string}","uuid":"${player.stringUUID}"}"""
         webSocketServer?.broadcastToAll(message)
     }
-    
+
     private fun onServerTick(server: net.minecraft.server.MinecraftServer) {
         tickCounter++
-        
+
         if (tickCounter >= UPDATE_INTERVAL) {
             tickCounter = 0
-            
+
             // Update player data for all online players
             server.playerList.players.forEach { player ->
                 updatePlayerData(player)
             }
-            
+
             // Send batch update to connected clients
             sendPlayerUpdates()
         }
     }
-    
+
     private fun updatePlayerData(player: ServerPlayer) {
         val info = PlayerInfo(
             uuid = player.stringUUID,
@@ -94,15 +94,15 @@ object GameDataCollector {
             posZ = player.z,
             dimension = player.level.dimension().location().toString()
         )
-        
+
         playerData[player.stringUUID] = info
     }
-    
+
     private fun sendPlayerUpdates() {
         if (playerData.isEmpty()) return
-        
+
         val webSocketServer = CraftDeckMod.getWebSocketServer() ?: return
-        
+
         playerData.values.forEach { info ->
             val message = buildString {
                 append("""{"type":"player_status",""")
@@ -118,10 +118,10 @@ object GameDataCollector {
                 append(""""dimension":"${info.dimension}"""")
                 append("}")
             }
-            
+
             webSocketServer.broadcastToAll(message)
         }
     }
-    
+
     fun getPlayerData(): Map<String, PlayerInfo> = playerData.toMap()
 }

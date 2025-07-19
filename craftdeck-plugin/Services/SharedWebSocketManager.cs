@@ -10,6 +10,12 @@ namespace CraftDeck.StreamDeckPlugin.Services
         private static readonly object _lock = new object();
         private static readonly ConcurrentDictionary<string, IWebSocketClient> _registeredClients = new ConcurrentDictionary<string, IWebSocketClient>();
 
+        static SharedWebSocketManager()
+        {
+            // グローバル設定変更の監視
+            GlobalSettingsService.SettingsChanged += OnGlobalSettingsChanged;
+        }
+
         public static MinecraftWebSocketService WebSocketService
         {
             get
@@ -20,7 +26,9 @@ namespace CraftDeck.StreamDeckPlugin.Services
                     {
                         if (_webSocketService == null)
                         {
-                            _webSocketService = new MinecraftWebSocketService();
+                            // グローバル設定からサーバーURLを取得
+                            var serverUrl = GlobalSettingsService.GetServerUrl();
+                            _webSocketService = new MinecraftWebSocketService(serverUrl);
                             SetupEventHandlers();
                         }
                     }
@@ -137,6 +145,68 @@ namespace CraftDeck.StreamDeckPlugin.Services
                     Console.WriteLine($"Error notifying client of error: {ex.Message}");
                 }
             }
+        }
+
+        /// <summary>
+        /// グローバル設定が変更された時の処理
+        /// </summary>
+        private static void OnGlobalSettingsChanged(GlobalSettingsService.GlobalSettings settings)
+        {
+            Console.WriteLine("Global settings changed, updating WebSocket service");
+
+            // 既存の接続があれば切断
+            if (_webSocketService != null && _webSocketService.IsConnected)
+            {
+                _webSocketService.DisconnectAsync();
+            }
+
+            // 新しい設定でWebSocketサービスを再作成
+            lock (_lock)
+            {
+                _webSocketService = new MinecraftWebSocketService(settings.ServerUrl);
+                SetupEventHandlers();
+            }
+
+            // 自動接続が有効な場合は再接続
+            if (settings.AutoConnect)
+            {
+                _ = _webSocketService.ConnectAsync();
+            }
+        }
+
+        /// <summary>
+        /// サーバーURLを更新（GlobalSettingsServiceから呼び出される）
+        /// </summary>
+        public static void UpdateServerUrl(string newServerUrl)
+        {
+            Console.WriteLine($"Updating WebSocket server URL to: {newServerUrl}");
+
+            // 既存の接続があれば切断
+            if (_webSocketService != null && _webSocketService.IsConnected)
+            {
+                _webSocketService.DisconnectAsync();
+            }
+
+            // 新しいURLでWebSocketサービスを再作成
+            lock (_lock)
+            {
+                _webSocketService = new MinecraftWebSocketService(newServerUrl);
+                SetupEventHandlers();
+            }
+
+            // 自動接続が有効な場合は再接続
+            if (GlobalSettingsService.GetAutoConnect())
+            {
+                _ = _webSocketService.ConnectAsync();
+            }
+        }
+
+        /// <summary>
+        /// 現在のサーバーURLを取得
+        /// </summary>
+        public static string GetCurrentServerUrl()
+        {
+            return GlobalSettingsService.GetServerUrl();
         }
     }
 
