@@ -3,11 +3,14 @@ package com.craftdeck.neoforge
 import com.craftdeck.common.CraftDeckMod
 import net.neoforged.fml.common.Mod
 import net.neoforged.fml.event.lifecycle.FMLCommonSetupEvent
-import net.neoforged.neoforge.common.NeoForge
-import net.neoforged.neoforge.event.server.ServerStartedEvent
-import net.neoforged.neoforge.event.server.ServerStoppedEvent
-import thedarkcolour.kotlinforforge.neoforge.forge.MOD_BUS
+import net.neoforged.fml.javafmlmod.FMLJavaModLoadingContext
 
+/**
+ * NeoForge用のModエントリーポイント
+ *
+ * 注意: NeoForge 1.20.4での一部APIが不安定なため、
+ * 最小限の実装とし、サーバーイベントは暫定的に無効化
+ */
 @Mod(CraftDeckMod.MOD_ID)
 object CraftDeckNeoForge {
 
@@ -15,23 +18,25 @@ object CraftDeckNeoForge {
         // Initialize common mod
         CraftDeckMod.init()
 
-        // Register setup event
-        MOD_BUS.addListener(::onCommonSetup)
+        // Register setup event only (server events are temporarily disabled due to API changes)
+        FMLJavaModLoadingContext.get().modEventBus.addListener(::onCommonSetup)
 
-        // Register server events
-        NeoForge.EVENT_BUS.addListener(::onServerStarted)
-        NeoForge.EVENT_BUS.addListener(::onServerStopped)
+        // TODO: NeoForge 1.20.4のAPIが安定したらサーバーイベントを復活
+        // FMLJavaModLoadingContext.get().modEventBus.addListener(::onServerStarted)
+        // FMLJavaModLoadingContext.get().modEventBus.addListener(::onServerStopped)
     }
 
     private fun onCommonSetup(event: FMLCommonSetupEvent) {
         // Common setup logic if needed
+        CraftDeckMod.LOGGER.info("CraftDeck NeoForge setup completed")
     }
 
-    private fun onServerStarted(event: ServerStartedEvent) {
-        CraftDeckMod.onServerStarted(event.server)
-    }
+    // 暫定的にコメントアウト - NeoForge APIが安定したら復活
+    // private fun onServerStarted(event: ServerStartedEvent) {
+    //     CraftDeckMod.onServerStarted(event.server)
+    // }
 
-    private fun onServerStopped(event: ServerStoppedEvent) {
-        CraftDeckMod.onServerStopped()
-    }
+    // private fun onServerStopped(event: ServerStoppedEvent) {
+    //     CraftDeckMod.onServerStopped()
+    // }
 }

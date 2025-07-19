@@ -51,10 +51,10 @@ object CommandHandler {
                 }
             }
 
-            val result = currentServer.commands.performPrefixedCommand(commandSource, command)
-            CraftDeckMod.LOGGER.info("Executed command '$command' with result: $result")
+            currentServer.commands.performPrefixedCommand(commandSource, command)
+            CraftDeckMod.LOGGER.info("Executed command '$command' successfully")
 
-            CommandResult(true, "Command executed successfully", result)
+            CommandResult(true, "Command executed successfully")
         } catch (e: Exception) {
             CraftDeckMod.LOGGER.error("Failed to execute command: $command", e)
             CommandResult(false, "Command execution failed: ${e.message}")

@@ -195,6 +195,7 @@ try {
 
 } catch {
     Write-Host "`nError: $($_.Exception.Message)" -ForegroundColor Red
+    Write-Host "`nPress any key to continue..." -ForegroundColor Cyan
     Read-Host
     exit 1
 } finally {

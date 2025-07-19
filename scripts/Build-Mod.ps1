@@ -316,6 +316,7 @@ function Main {
 
     # Validate environment
     if (-not (Test-BuildEnvironment)) {
+        Write-Host "`nPress any key to continue..." -ForegroundColor Cyan
         Read-Host
         exit 1
     }
@@ -329,6 +330,7 @@ function Main {
         if ($Clean) {
             $success = Invoke-Clean
             if (-not $success) {
+                Write-Host "`nPress any key to continue..." -ForegroundColor Cyan
                 Read-Host
                 exit 1
             }
@@ -350,15 +352,18 @@ function Main {
 
         if ($success) {
             Write-Host "🎉 Mod build completed successfully!" -ForegroundColor Green
+            Write-Host "`nPress any key to continue..." -ForegroundColor Cyan
             Read-Host
             exit 0
         } else {
             Write-Host "💥 Mod build failed!" -ForegroundColor Red
+            Write-Host "`nPress any key to continue..." -ForegroundColor Cyan
             Read-Host
             exit 1
         }
     } catch {
         Write-Host "❌ Build error: $($_.Exception.Message)" -ForegroundColor Red
+        Write-Host "`nPress any key to continue..." -ForegroundColor Cyan
         Read-Host
         exit 1
     } finally {

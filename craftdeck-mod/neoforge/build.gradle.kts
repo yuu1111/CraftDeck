@@ -32,14 +32,19 @@ repositories {
         name = "NeoForged"
         url = uri("https://maven.neoforged.net/releases/")
     }
+    // KotlinForForge
+    maven {
+        name = "Kotlin for Forge"
+        url = uri("https://thedarkcolour.github.io/KotlinForForge/")
+    }
 }
 
 dependencies {
     "minecraft"("com.mojang:minecraft:${rootProject.property("minecraft_version")}")
     "mappings"(loom.officialMojangMappings())
-    
-    // NeoForge dependency using correct configuration
-    neoForge("net.neoforged:neoforge:${rootProject.property("neoforge_version")}")
+
+    // NeoForge dependency using modImplementation configuration
+    "modImplementation"("net.neoforged:neoforge:${rootProject.property("neoforge_version")}")
 
     modApi("dev.architectury:architectury-neoforge:${rootProject.property("architectury_version")}")
 
@@ -72,7 +77,9 @@ tasks {
     remapJar {
         inputFile.set(shadowJar.get().archiveFile)
         dependsOn(shadowJar)
-        archiveClassifier.set(null as String?)
+        // マルチローダー対応JAR命名規則
+        val mcVersion = rootProject.property("minecraft_version").toString()
+        archiveClassifier.set("MC${mcVersion}-neoforge")
     }
 
     jar {

@@ -55,11 +55,11 @@ object VersionAdapter {
     fun getDimensionName(player: ServerPlayer): String {
         return try {
             // Modern approach (1.16+)
-            player.level.dimension().location().toString()
+            player.level().dimension().location().toString()
         } catch (e: Exception) {
             try {
                 // Fallback approach
-                player.level.dimension().toString()
+                player.level().dimension().toString()
             } catch (e2: Exception) {
                 // Ultimate fallback
                 "unknown_dimension"

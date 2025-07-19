@@ -76,15 +76,15 @@ object CraftDeckMod {
                             val playerCount = GameDataCollector.getPlayerData().size
 
                             context.source.sendSuccess(
-                                Component.literal("CraftDeck Status:"),
+                                { Component.literal("CraftDeck Status:") },
                                 false
                             )
                             context.source.sendSuccess(
-                                Component.literal("- WebSocket clients: $clientCount"),
+                                { Component.literal("- WebSocket clients: $clientCount") },
                                 false
                             )
                             context.source.sendSuccess(
-                                Component.literal("- Tracked players: $playerCount"),
+                                { Component.literal("- Tracked players: $playerCount") },
                                 false
                             )
                             1
@@ -93,7 +93,7 @@ object CraftDeckMod {
                     .then(com.mojang.brigadier.builder.LiteralArgumentBuilder.literal<CommandSourceStack>("test")
                         .executes { context: CommandContext<CommandSourceStack> ->
                             context.source.sendSuccess(
-                                Component.literal("CraftDeck mod is working correctly!"),
+                                { Component.literal("CraftDeck mod is working correctly!") },
                                 false
                             )
                             1

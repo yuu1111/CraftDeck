@@ -27,7 +27,17 @@
       "Bash(java:*)",
       "Bash(where java)",
       "Bash(echo $JAVA_HOME)",
-      "Bash(Remove-Item \"C:\\Dev\\CraftDeck\\test-java-detection.ps1\")"
+      "Bash(Remove-Item \"C:\\Dev\\CraftDeck\\test-java-detection.ps1\")",
+      "Bash(dotnet clean:*)",
+      "WebFetch(domain:files.minecraftforge.net)",
+      "WebFetch(domain:docs.architectury.dev)",
+      "WebFetch(domain:github.com)",
+      "WebFetch(domain:maven.architectury.dev)",
+      "WebFetch(domain:www.curseforge.com)",
+      "WebFetch(domain:maven.quiltmc.org)",
+      "Bash(.gradlew clean build)",
+      "Bash(ls:*)",
+      "Bash(gradlew.bat :fabric:build:*)"
     ],
     "deny": []
   }

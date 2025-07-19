@@ -224,7 +224,7 @@ function Deploy-ToStreamDeck {
 function Show-BuildInfo {
     Write-Host "📊 Build Information:" -ForegroundColor Cyan
 
-    $outputDir = if ($Publish) { "publish" } else { "bin\$Configuration\net6.0" }
+    $outputDir = if ($Publish) { "publish" } else { "bin\$Configuration\net6.0\win-x64" }
     $outputPath = Join-Path $pluginDir $outputDir
 
     if ($Publish) {
@@ -236,27 +236,21 @@ function Show-BuildInfo {
             Write-Host "   Modified: $($fileInfo.LastWriteTime)" -ForegroundColor Gray
         }
     } else {
+        # Check for executable first (self-contained), then DLL
+        $exePath = Join-Path $outputPath "CraftDeck.StreamDeckPlugin.exe"
         $dllPath = Join-Path $outputPath "CraftDeck.StreamDeckPlugin.dll"
-        if (Test-Path $dllPath) {
+
+        if (Test-Path $exePath) {
+            $fileInfo = Get-Item $exePath
+            Write-Host "   Runtime: win-x64" -ForegroundColor Gray
+            Write-Host "     - $($fileInfo.Name) ($([math]::Round($fileInfo.Length / 1MB, 1)) MB)" -ForegroundColor Gray
+        } elseif (Test-Path $dllPath) {
             $fileInfo = Get-Item $dllPath
             Write-Host "   Assembly: $($fileInfo.Name)" -ForegroundColor Gray
             Write-Host "   Size: $([math]::Round($fileInfo.Length / 1KB, 1)) KB" -ForegroundColor Gray
             Write-Host "   Modified: $($fileInfo.LastWriteTime)" -ForegroundColor Gray
         }
 
-        # Check for runtime-specific builds
-        $runtimes = @("win-x64", "osx-x64", "linux-x64")
-        foreach ($runtime in $runtimes) {
-            $runtimeDir = Join-Path $outputPath $runtime
-            if (Test-Path $runtimeDir) {
-                Write-Host "   Runtime: $runtime" -ForegroundColor Yellow
-                $exe = Get-ChildItem $runtimeDir -Filter "*.exe" | Select-Object -First 1
-                if ($exe) {
-                    $size = [math]::Round($exe.Length / 1MB, 1)
-                    Write-Host "     - $($exe.Name) ($size MB)" -ForegroundColor Gray
-                }
-            }
-        }
     }
 
     # Verify required files

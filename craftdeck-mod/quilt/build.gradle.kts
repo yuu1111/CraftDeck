@@ -87,6 +87,12 @@ tasks.jar {
     archiveClassifier.set("dev")
 }
 
+// マルチローダー対応JAR命名規則
+tasks.remapJar {
+    val mcVersion = rootProject.property("minecraft_version").toString()
+    archiveClassifier.set("MC${mcVersion}-quilt")
+}
+
 tasks.sourcesJar {
     val commonSources = project(":common").tasks.getByName<Jar>("sourcesJar")
     dependsOn(commonSources)

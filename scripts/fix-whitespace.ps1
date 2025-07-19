@@ -2,7 +2,7 @@
 
 param(
     [string]$Path = ".",
-    [string[]]$IncludeFileTypes = @("*.cs", "*.xaml", "*.xml", "*.csproj", "*.sln", "*.config", "*.json", "*.yml", "*.kt", "*.kts", "*.md", "*.java", "*ps1"),
+    [string[]]$IncludeFileTypes = @("*.cs", "*.xaml", "*.xml", "*.csproj", "*.sln", "*.config", "*.json", "*.yml", "*.kt", "*.kts", "*.md", "*.java", "*.ps1", "*.kts"),
     [string[]]$ExcludePaths = @()
 )
 

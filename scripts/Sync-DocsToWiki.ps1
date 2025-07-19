@@ -13,6 +13,7 @@ Write-Host "==========================" -ForegroundColor Cyan
 if (-not (Test-Path $WikiPath)) {
     Write-Host "`nWiki folder not found at: $WikiPath" -ForegroundColor Red
     Write-Host "Please create the wiki folder and add wiki content first." -ForegroundColor Yellow
+    Write-Host "`nPress any key to continue..." -ForegroundColor Cyan
     Read-Host
     exit 1
 }
@@ -47,6 +48,7 @@ if (-not $wikiExists) {
     Write-Host "6. Save any content (can be deleted later)" -ForegroundColor White
     Write-Host "7. Run this script again" -ForegroundColor White
     Pop-Location
+    Write-Host "`nPress any key to continue..." -ForegroundColor Cyan
     Read-Host
     exit 1
 }
