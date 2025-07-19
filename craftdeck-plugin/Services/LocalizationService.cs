@@ -257,5 +257,57 @@ namespace CraftDeck.StreamDeckPlugin.Services
             public static string Connected => Get("common.connected");
             public static string Disconnected => Get("common.disconnected");
         }
+
+        /// <summary>
+        /// 接続状態メッセージを取得
+        /// </summary>
+        public static class ConnectionStates
+        {
+            public static string WaitingForMinecraft => Get("ConnectionStates.WaitingForMinecraft");
+            public static string Connected => Get("ConnectionStates.Connected");
+            public static string Disconnected => Get("ConnectionStates.Disconnected");
+            public static string Connecting => Get("ConnectionStates.Connecting");
+            public static string ConnectionFailed => Get("ConnectionStates.ConnectionFailed");
+            public static string Reconnecting => Get("ConnectionStates.Reconnecting");
+            public static string NoData => Get("ConnectionStates.NoData");
+        }
+
+        /// <summary>
+        /// エラーメッセージを取得
+        /// </summary>
+        public static class ErrorMessages
+        {
+            public static string ConnectionError => Get("ErrorMessages.ConnectionError");
+            public static string CommandExecutionFailed => Get("ErrorMessages.CommandExecutionFailed");
+            public static string InvalidSettings => Get("ErrorMessages.InvalidSettings");
+            public static string WebSocketError => Get("ErrorMessages.WebSocketError");
+            public static string PlayerNotFound => Get("ErrorMessages.PlayerNotFound");
+            public static string ServerNotResponding => Get("ErrorMessages.ServerNotResponding");
+            public static string InvalidCommand => Get("ErrorMessages.InvalidCommand");
+            public static string PermissionDenied => Get("ErrorMessages.PermissionDenied");
+        }
+
+        /// <summary>
+        /// ステータスメッセージを取得
+        /// </summary>
+        public static class StatusMessages
+        {
+            public static string CommandExecuted => Get("StatusMessages.CommandExecuted");
+            public static string SettingsSaved => Get("StatusMessages.SettingsSaved");
+            public static string AutoConnectEnabled => Get("StatusMessages.AutoConnectEnabled");
+            public static string AutoConnectDisabled => Get("StatusMessages.AutoConnectDisabled");
+            
+            /// <summary>
+            /// プレイヤー参加メッセージを取得（プレイヤー名を含む）
+            /// </summary>
+            public static string PlayerJoined(string playerName) => 
+                Get("StatusMessages.PlayerJoined", new Dictionary<string, string> { {"playerName", playerName} });
+            
+            /// <summary>
+            /// プレイヤー退出メッセージを取得（プレイヤー名を含む）
+            /// </summary>
+            public static string PlayerLeft(string playerName) => 
+                Get("StatusMessages.PlayerLeft", new Dictionary<string, string> { {"playerName", playerName} });
+        }
     }
 }

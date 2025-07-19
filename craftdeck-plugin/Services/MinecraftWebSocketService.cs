@@ -60,7 +60,7 @@ namespace CraftDeck.StreamDeckPlugin.Services
             {
                 _isConnected = false;
                 ConnectionStateChanged?.Invoke(false);
-                ErrorReceived?.Invoke($"Connection failed: {ex.Message}");
+                ErrorReceived?.Invoke($"{LocalizationService.ErrorMessages.ConnectionError}: {ex.Message}");
                 return false;
             }
         }
@@ -78,7 +78,7 @@ namespace CraftDeck.StreamDeckPlugin.Services
             }
             catch (Exception ex)
             {
-                ErrorReceived?.Invoke($"Disconnect error: {ex.Message}");
+                ErrorReceived?.Invoke($"{LocalizationService.ErrorMessages.WebSocketError}: {ex.Message}");
             }
         }
 
@@ -103,7 +103,7 @@ namespace CraftDeck.StreamDeckPlugin.Services
             }
             catch (Exception ex)
             {
-                ErrorReceived?.Invoke($"Failed to send command: {ex.Message}");
+                ErrorReceived?.Invoke($"{LocalizationService.ErrorMessages.CommandExecutionFailed}: {ex.Message}");
                 return false;
             }
         }
@@ -124,7 +124,7 @@ namespace CraftDeck.StreamDeckPlugin.Services
             }
             catch (Exception ex)
             {
-                ErrorReceived?.Invoke($"Failed to request player data: {ex.Message}");
+                ErrorReceived?.Invoke($"{LocalizationService.ErrorMessages.ServerNotResponding}: {ex.Message}");
                 return false;
             }
         }

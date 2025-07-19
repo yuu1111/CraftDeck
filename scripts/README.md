@@ -4,25 +4,25 @@
 
 ## スクリプト一覧
 
-### 🚀 Deploy-CraftDeck.ps1
+### 🚀 Deploy-Plugin.ps1
 **用途**: 本番デプロイメント用スクリプト
 **説明**: Minecraft Mod と StreamDeck Plugin をビルドしてデプロイします。
 
 ```powershell
 # 全体をデプロイ (推奨)
-.\Deploy-CraftDeck.ps1
+.\Deploy-Plugin.ps1
 
 # StreamDeck Plugin のみデプロイ
-.\Deploy-CraftDeck.ps1 -Component Plugin
+.\Deploy-Plugin.ps1 -Component Plugin
 
 # Minecraft Mod のみビルド
-.\Deploy-CraftDeck.ps1 -Component Mod
+.\Deploy-Plugin.ps1 -Component Mod
 
 # Debug版でデプロイ
-.\Deploy-CraftDeck.ps1 -Configuration Debug
+.\Deploy-Plugin.ps1 -Configuration Debug
 
 # StreamDeck の自動起動をスキップ
-.\Deploy-CraftDeck.ps1 -SkipStreamDeckRestart
+.\Deploy-Plugin.ps1 -SkipStreamDeckRestart
 ```
 
 ### 🔨 Build-CraftDeck.ps1
@@ -91,7 +91,7 @@
 | `-Component` | ビルド対象コンポーネント | `Mod`, `Plugin`, `All` | `All` |
 | `-Configuration` | ビルド構成 | `Debug`, `Release` | Deploy: `Release`, Build: `Debug` |
 
-### Deploy-CraftDeck.ps1 専用
+### Deploy-Plugin.ps1 専用
 
 | パラメータ | 説明 |
 |-----------|------|
@@ -132,7 +132,7 @@
 .\Build-CraftDeck.ps1 -Component Plugin
 
 # 2. StreamDeck で実際にテスト
-.\Deploy-CraftDeck.ps1 -Component Plugin -Configuration Debug
+.\Deploy-Plugin.ps1 -Component Plugin -Configuration Debug
 
 # 3. 本格的なテスト前
 .\Build-CraftDeck.ps1 -Clean
@@ -174,7 +174,7 @@ git push origin v1.2.0
 .\Build-CraftDeck.ps1 -Component All
 
 # 2. デバッグ版でのテスト
-.\Deploy-CraftDeck.ps1 -Configuration Debug -SkipTests
+.\Deploy-Plugin.ps1 -Configuration Debug -SkipTests
 ```
 
 ## 前提条件
@@ -200,7 +200,7 @@ Build-CraftDeck.ps1 は自動的に以下をチェックします：
 1. **"StreamDeck process cannot be stopped"**
    ```powershell
    # 手動で StreamDeck を終了してから再実行
-   .\Deploy-CraftDeck.ps1 -SkipStreamDeckRestart
+   .\Deploy-Plugin.ps1 -SkipStreamDeckRestart
    ```
 
 2. **"Build failed with access denied"**
@@ -227,7 +227,7 @@ Build-CraftDeck.ps1 は自動的に以下をチェックします：
 
 ```
 Scripts/
-├── Deploy-CraftDeck.ps1    # デプロイメントスクリプト
+├── Deploy-Plugin.ps1    # デプロイメントスクリプト
 ├── Build-CraftDeck.ps1     # ビルドスクリプト
 └── README.md               # このファイル
 

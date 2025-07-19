@@ -213,3 +213,7 @@ Co-Authored-By: Claude <noreply@anthropic.com>"
 } finally {
     Set-Location $ProjectRoot
 }
+
+# Wait for user input before closing
+Write-Host "`nPress any key to continue..." -ForegroundColor Cyan
+Read-Host

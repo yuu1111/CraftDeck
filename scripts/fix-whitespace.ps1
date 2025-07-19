@@ -51,3 +51,7 @@ foreach ($fileType in $IncludeFileTypes) {
 }
 
 Write-Host "`n完了: 合計 $totalFixed 件のファイルの末尾空白文字を削除しました"
+
+# Wait for user input before closing
+Write-Host "`nPress any key to continue..." -ForegroundColor Cyan
+Read-Host

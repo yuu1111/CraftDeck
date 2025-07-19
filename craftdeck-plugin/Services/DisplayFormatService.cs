@@ -91,7 +91,7 @@ namespace CraftDeck.StreamDeckPlugin.Services
                 LocalizationService.SetLanguage(language);
 
             if (string.IsNullOrEmpty(format))
-                return $"{defaultIcon} {LocalizationService.Common.Offline}";
+                return $"{defaultIcon} {LocalizationService.ConnectionStates.WaitingForMinecraft}";
 
             // プレースホルダーを"--"で置換
             return PlaceholderRegex.Replace(format, "--");
@@ -106,7 +106,37 @@ namespace CraftDeck.StreamDeckPlugin.Services
                 LocalizationService.SetLanguage(language);
 
             if (string.IsNullOrEmpty(format))
-                return $"{defaultIcon} {LocalizationService.Common.NoData}";
+                return $"{defaultIcon} {LocalizationService.ConnectionStates.NoData}";
+
+            // プレースホルダーを"--"で置換
+            return PlaceholderRegex.Replace(format, "--");
+        }
+
+        /// <summary>
+        /// 接続中メッセージを生成
+        /// </summary>
+        public static string FormatConnectingMessage(string format, string defaultIcon = "🔄", string language = null)
+        {
+            if (!string.IsNullOrEmpty(language))
+                LocalizationService.SetLanguage(language);
+
+            if (string.IsNullOrEmpty(format))
+                return $"{defaultIcon} {LocalizationService.ConnectionStates.Connecting}";
+
+            // プレースホルダーを"--"で置換
+            return PlaceholderRegex.Replace(format, "--");
+        }
+
+        /// <summary>
+        /// 接続失敗メッセージを生成
+        /// </summary>
+        public static string FormatConnectionFailedMessage(string format, string defaultIcon = "❌", string language = null)
+        {
+            if (!string.IsNullOrEmpty(language))
+                LocalizationService.SetLanguage(language);
+
+            if (string.IsNullOrEmpty(format))
+                return $"{defaultIcon} {LocalizationService.ConnectionStates.ConnectionFailed}";
 
             // プレースホルダーを"--"で置換
             return PlaceholderRegex.Replace(format, "--");

@@ -335,3 +335,7 @@ function Main {
 
 # Execute main function
 Main
+
+# Wait for user input before closing
+Write-Host "`nPress any key to continue..." -ForegroundColor Cyan
+Read-Host

@@ -47,5 +47,44 @@
     "Placeholder Level": "レベル: {level}, {experience}",
     "Placeholder Position": "座標: {x}, {y}, {z}",
     "Placeholder Other": "その他: {gamemode}, {dimension}, {name}, {clientname}"
+  },
+  "ConnectionStates": {
+    "WaitingForMinecraft": "Minecraftを待機中...",
+    "Connected": "接続済み",
+    "Disconnected": "切断",
+    "Connecting": "接続中...",
+    "ConnectionFailed": "接続失敗",
+    "Reconnecting": "再接続中...",
+    "NoData": "データなし"
+  },
+  "ErrorMessages": {
+    "ConnectionError": "Minecraftへの接続に失敗しました",
+    "CommandExecutionFailed": "コマンドの実行に失敗しました",
+    "InvalidSettings": "無効な設定が検出されました",
+    "WebSocketError": "WebSocket通信エラーが発生しました",
+    "PlayerNotFound": "プレイヤーが見つかりません",
+    "ServerNotResponding": "サーバーが応答しません",
+    "InvalidCommand": "無効なコマンド形式です",
+    "PermissionDenied": "権限が拒否されました"
+  },
+  "StatusMessages": {
+    "CommandExecuted": "コマンドが正常に実行されました",
+    "PlayerJoined": "プレイヤーが参加しました: {playerName}",
+    "PlayerLeft": "プレイヤーが退出しました: {playerName}",
+    "SettingsSaved": "設定が保存されました",
+    "AutoConnectEnabled": "自動接続が有効になりました",
+    "AutoConnectDisabled": "自動接続が無効になりました"
+  },
+  "TranslationKeys": {
+    "craftdeck.server.started": "CraftDeckサーバーがポート%sで開始されました",
+    "craftdeck.server.stopped": "CraftDeckサーバーが停止しました",
+    "craftdeck.player.joined": "プレイヤーが参加しました: %s",
+    "craftdeck.player.left": "プレイヤーが退出しました: %s",
+    "craftdeck.command.success": "コマンドが正常に実行されました",
+    "craftdeck.command.failed": "コマンドの実行に失敗しました: %s",
+    "craftdeck.status.connected": "CraftDeckに接続しました",
+    "craftdeck.status.disconnected": "CraftDeckから切断しました",
+    "craftdeck.status.waiting": "CraftDeck接続を待機中",
+    "craftdeck.connection.welcome": "CraftDeckへようこそ"
   }
 }

@@ -107,12 +107,15 @@ namespace CraftDeck.StreamDeckPlugin.Actions
 
         public void OnCommandResultReceived(CommandResultMessage result)
         {
-            Console.WriteLine($"Command result: {result.Success} - {result.Message}");
+            var message = result.Success 
+                ? LocalizationService.StatusMessages.CommandExecuted
+                : LocalizationService.ErrorMessages.CommandExecutionFailed;
+            Console.WriteLine($"{message}: {result.Message}");
         }
 
         public void OnErrorReceived(string error)
         {
-            Console.WriteLine($"WebSocket error: {error}");
+            Console.WriteLine($"{LocalizationService.ErrorMessages.WebSocketError}: {error}");
         }
     }
 }

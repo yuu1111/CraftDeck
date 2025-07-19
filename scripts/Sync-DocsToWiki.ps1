@@ -78,3 +78,7 @@ Updated from main repository commit: $(git -C "$PSScriptRoot\.." rev-parse --sho
 Pop-Location
 
 Write-Host "`nWiki URL: https://github.com/yuu1111/CraftDeck/wiki" -ForegroundColor Cyan
+
+# Wait for user input before closing
+Write-Host "`nPress any key to continue..." -ForegroundColor Cyan
+Read-Host

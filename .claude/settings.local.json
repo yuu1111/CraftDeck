@@ -20,7 +20,8 @@
       "Bash(cp:*)",
       "Bash(rg:*)",
       "WebFetch(domain:docs.elgato.com)",
-      "Bash(dotnet publish:*)"
+      "Bash(dotnet publish:*)",
+      "Bash(find:*)"
     ],
     "deny": []
   }

@@ -11,22 +11,21 @@ class CraftDeckWebSocketServer(port: Int) : WebSocketServer(InetSocketAddress(po
     private val connectedClients = ConcurrentHashMap<WebSocket, String>()
 
     override fun onStart() {
-        CraftDeckMod.LOGGER.info("WebSocket server started successfully on port $port")
+        CraftDeckMod.LOGGER.info(CraftDeckLocalization.ServerLog.serverStarted(port))
     }
 
     override fun onOpen(conn: WebSocket, handshake: ClientHandshake) {
         val clientAddress = conn.remoteSocketAddress.address.hostAddress
         connectedClients[conn] = clientAddress
-        CraftDeckMod.LOGGER.info("New connection from $clientAddress")
+        CraftDeckMod.LOGGER.info(CraftDeckLocalization.ServerLog.connectionNew(clientAddress))
 
-        // Send initial connection confirmation
-        val message = """{"type":"connection","status":"connected","message":"Welcome to CraftDeck"}"""
-        conn.send(message)
+        // Send initial connection confirmation with translation key
+        conn.send(CraftDeckLocalization.WebSocketMessage.welcome())
     }
 
     override fun onClose(conn: WebSocket, code: Int, reason: String, remote: Boolean) {
         val clientAddress = connectedClients.remove(conn)
-        CraftDeckMod.LOGGER.info("Closed connection to $clientAddress (code: $code, reason: $reason)")
+        CraftDeckMod.LOGGER.info(CraftDeckLocalization.ServerLog.connectionClosed(clientAddress ?: "unknown"))
     }
 
     override fun onMessage(conn: WebSocket, message: String) {
@@ -71,7 +70,7 @@ class CraftDeckWebSocketServer(port: Int) : WebSocketServer(InetSocketAddress(po
 
     private fun handleCommandExecution(conn: WebSocket, message: String) {
         try {
-            CraftDeckMod.LOGGER.info("Received command execution request: $message")
+            CraftDeckMod.LOGGER.info(CraftDeckLocalization.ServerLog.commandReceived(message))
 
             // Extract command from JSON (basic extraction)
             val commandStart = message.indexOf("\"command\":\"") + 11
@@ -87,18 +86,11 @@ class CraftDeckWebSocketServer(port: Int) : WebSocketServer(InetSocketAddress(po
                 message.substring(playerStart, playerEnd)
             } else null
 
-            CraftDeckMod.LOGGER.info("Executing command '$command' for player: $playerName")
+            CraftDeckMod.LOGGER.info(CraftDeckLocalization.ServerLog.commandExecuting(command, playerName))
             val result = CommandHandler.executeCommand(command, playerName)
 
-            val response = buildString {
-                append("""{"type":"command_result",""")
-                append(""""success":${result.success},""")
-                append(""""message":"${result.message.replace("\"", "\\\"")},"""")
-                append(""""result":${result.result}""")
-                append("}")
-            }
-
-            conn.send(response)
+            // Send result with translation key
+            conn.send(CraftDeckLocalization.WebSocketMessage.commandResult(result.success, result.message))
         } catch (e: Exception) {
             CraftDeckMod.LOGGER.error("Error executing command", e)
             val errorResponse = """{"type":"error","message":"Command execution failed: ${e.message}"}"""

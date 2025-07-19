@@ -1,0 +1,27 @@
+{
+  "craftdeck.server.starting": "Starting WebSocket server on port %s",
+  "craftdeck.server.started": "WebSocket server started successfully on port %s",
+  "craftdeck.server.stopped": "WebSocket server stopped",
+  "craftdeck.server.error": "Failed to start WebSocket server: %s",
+  "craftdeck.player.joined": "Player joined: %s",
+  "craftdeck.player.left": "Player left: %s",
+  "craftdeck.connection.new": "New connection from %s",
+  "craftdeck.connection.closed": "Closed connection to %s",
+  "craftdeck.command.received": "Received command execution request: %s",
+  "craftdeck.command.executing": "Executing command '%s' for player: %s",
+  "craftdeck.command.success": "Command executed successfully",
+  "craftdeck.command.failed": "Command execution failed: %s",
+  "craftdeck.data.collecting": "Game data collector initialized",
+  "craftdeck.data.updating": "Updating player data for %s players",
+  "craftdeck.websocket.error": "WebSocket error occurred",
+  "craftdeck.mod.initializing": "Initializing CraftDeck Mod",
+  "craftdeck.mod.ready": "CraftDeck is ready",
+  
+  "craftdeck.status.connected": "Connected to CraftDeck",
+  "craftdeck.status.disconnected": "Disconnected from CraftDeck",
+  "craftdeck.status.waiting": "Waiting for CraftDeck connection",
+  
+  "craftdeck.config.port": "WebSocket Port",
+  "craftdeck.config.auto_connect": "Auto Connect",
+  "craftdeck.config.language": "Client Language"
+}

@@ -20,10 +20,10 @@
     Skip running tests before deployment
 
 .EXAMPLE
-    .\Deploy-CraftDeck.ps1
-    .\Deploy-CraftDeck.ps1 -Component Plugin -Configuration Debug
-    .\Deploy-CraftDeck.ps1 -Component Mod
-    .\Deploy-CraftDeck.ps1 -Component All -SkipStreamDeckRestart
+    .\Deploy-Plugin.ps1
+    .\Deploy-Plugin.ps1 -Component Plugin -Configuration Debug
+    .\Deploy-Plugin.ps1 -Component Mod
+    .\Deploy-Plugin.ps1 -Component All -SkipStreamDeckRestart
 
 #>
 
@@ -362,3 +362,7 @@ function Main {
 
 # Execute main function
 Main
+
+# Wait for user input before closing
+Write-Host "`nPress any key to continue..." -ForegroundColor Cyan
+Read-Host

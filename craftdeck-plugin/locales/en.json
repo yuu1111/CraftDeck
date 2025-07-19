@@ -47,5 +47,44 @@
     "Placeholder Level": "Level: {level}, {experience}",
     "Placeholder Position": "Position: {x}, {y}, {z}",
     "Placeholder Other": "Other: {gamemode}, {dimension}, {name}, {clientname}"
+  },
+  "ConnectionStates": {
+    "WaitingForMinecraft": "Waiting for Minecraft...",
+    "Connected": "Connected",
+    "Disconnected": "Disconnected", 
+    "Connecting": "Connecting...",
+    "ConnectionFailed": "Connection Failed",
+    "Reconnecting": "Reconnecting...",
+    "NoData": "No Data Available"
+  },
+  "ErrorMessages": {
+    "ConnectionError": "Failed to connect to Minecraft",
+    "CommandExecutionFailed": "Command execution failed",
+    "InvalidSettings": "Invalid settings detected",
+    "WebSocketError": "WebSocket communication error",
+    "PlayerNotFound": "Player not found",
+    "ServerNotResponding": "Server not responding",
+    "InvalidCommand": "Invalid command format",
+    "PermissionDenied": "Permission denied"
+  },
+  "StatusMessages": {
+    "CommandExecuted": "Command executed successfully",
+    "PlayerJoined": "Player joined: {playerName}",
+    "PlayerLeft": "Player left: {playerName}",
+    "SettingsSaved": "Settings saved",
+    "AutoConnectEnabled": "Auto-connect enabled",
+    "AutoConnectDisabled": "Auto-connect disabled"
+  },
+  "TranslationKeys": {
+    "craftdeck.server.started": "CraftDeck server started on port %s",
+    "craftdeck.server.stopped": "CraftDeck server stopped",
+    "craftdeck.player.joined": "Player joined: %s",
+    "craftdeck.player.left": "Player left: %s", 
+    "craftdeck.command.success": "Command executed successfully",
+    "craftdeck.command.failed": "Command execution failed: %s",
+    "craftdeck.status.connected": "Connected to CraftDeck",
+    "craftdeck.status.disconnected": "Disconnected from CraftDeck",
+    "craftdeck.status.waiting": "Waiting for CraftDeck connection",
+    "craftdeck.connection.welcome": "Welcome to CraftDeck"
   }
 }

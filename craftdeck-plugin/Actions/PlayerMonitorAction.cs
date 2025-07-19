@@ -163,7 +163,7 @@ namespace CraftDeck.StreamDeckPlugin.Actions
 
         public void OnErrorReceived(string error)
         {
-            Console.WriteLine($"WebSocket error in {_monitorType} monitor action: {error}");
+            Console.WriteLine($"{LocalizationService.ErrorMessages.WebSocketError}: {error}");
         }
     }
 

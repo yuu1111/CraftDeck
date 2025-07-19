@@ -54,22 +54,24 @@ object GameDataCollector {
 
     private fun onPlayerJoin(player: ServerPlayer) {
         val playerName = VersionAdapter.getPlayerDisplayName(player)
-        CraftDeckMod.LOGGER.info("Player joined: $playerName")
+        CraftDeckMod.LOGGER.info(CraftDeckLocalization.ServerLog.playerJoined(playerName))
         updatePlayerData(player)
 
         val webSocketServer = CraftDeckMod.getWebSocketServer()
-        val message = """{"type":"player_join","player":"$playerName","uuid":"${player.stringUUID}"}"""
-        webSocketServer?.broadcastToAll(message)
+        webSocketServer?.broadcastToAll(
+            CraftDeckLocalization.WebSocketMessage.playerJoined(playerName, player.stringUUID)
+        )
     }
 
     private fun onPlayerLeave(player: ServerPlayer) {
         val playerName = VersionAdapter.getPlayerDisplayName(player)
-        CraftDeckMod.LOGGER.info("Player left: $playerName")
+        CraftDeckMod.LOGGER.info(CraftDeckLocalization.ServerLog.playerLeft(playerName))
         playerData.remove(player.stringUUID)
 
         val webSocketServer = CraftDeckMod.getWebSocketServer()
-        val message = """{"type":"player_leave","player":"$playerName","uuid":"${player.stringUUID}"}"""
-        webSocketServer?.broadcastToAll(message)
+        webSocketServer?.broadcastToAll(
+            CraftDeckLocalization.WebSocketMessage.playerLeft(playerName, player.stringUUID)
+        )
     }
 
     private fun onServerTick(server: net.minecraft.server.MinecraftServer) {

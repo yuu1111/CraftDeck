@@ -15,22 +15,22 @@ object CraftDeckMod {
     private var webSocketServer: CraftDeckWebSocketServer? = null
 
     fun init() {
-        LOGGER.info("Initializing CraftDeck Mod")
+        LOGGER.info(CraftDeckLocalization.ServerLog.modInitializing())
 
         // Start WebSocket server
         try {
-            val port = 8080 // TODO: Make this configurable
+            val port = CraftDeckConfig.port
             webSocketServer = CraftDeckWebSocketServer(port)
             webSocketServer?.start()
-            LOGGER.info("WebSocket server started on port $port")
+            LOGGER.info(CraftDeckLocalization.ServerLog.serverStarted(port))
         } catch (e: Exception) {
-            LOGGER.error("Failed to start WebSocket server", e)
+            LOGGER.error(CraftDeckLocalization.ServerLog.serverError(e.message ?: "Unknown error"))
         }
 
         // Initialize game data collector
         try {
             GameDataCollector.init()
-            LOGGER.info("Game data collector initialized")
+            LOGGER.info(CraftDeckLocalization.ServerLog.dataCollecting())
         } catch (e: Exception) {
             LOGGER.error("Failed to initialize game data collector", e)
         }
@@ -56,7 +56,7 @@ object CraftDeckMod {
     fun getWebSocketServer(): CraftDeckWebSocketServer? = webSocketServer
 
     fun onServerStarted(server: MinecraftServer) {
-        LOGGER.info("Server started, CraftDeck is ready")
+        LOGGER.info(CraftDeckLocalization.ServerLog.modReady())
         GameDataCollector.setServer(server)
     }
 

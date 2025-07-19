@@ -1,0 +1,27 @@
+{
+  "craftdeck.server.starting": "ポート%sでWebSocketサーバーを開始中",
+  "craftdeck.server.started": "ポート%sでWebSocketサーバーが正常に開始されました",
+  "craftdeck.server.stopped": "WebSocketサーバーが停止しました",
+  "craftdeck.server.error": "WebSocketサーバーの開始に失敗しました: %s",
+  "craftdeck.player.joined": "プレイヤーが参加しました: %s",
+  "craftdeck.player.left": "プレイヤーが退出しました: %s",
+  "craftdeck.connection.new": "%sからの新しい接続",
+  "craftdeck.connection.closed": "%sへの接続を閉じました",
+  "craftdeck.command.received": "コマンド実行要求を受信しました: %s",
+  "craftdeck.command.executing": "プレイヤー %2$s 用のコマンド '%1$s' を実行中",
+  "craftdeck.command.success": "コマンドが正常に実行されました",
+  "craftdeck.command.failed": "コマンドの実行に失敗しました: %s",
+  "craftdeck.data.collecting": "ゲームデータコレクターが初期化されました",
+  "craftdeck.data.updating": "%s人のプレイヤーデータを更新中",
+  "craftdeck.websocket.error": "WebSocketエラーが発生しました",
+  "craftdeck.mod.initializing": "CraftDeckModを初期化中",
+  "craftdeck.mod.ready": "CraftDeckの準備が完了しました",
+  
+  "craftdeck.status.connected": "CraftDeckに接続しました",
+  "craftdeck.status.disconnected": "CraftDeckから切断しました",
+  "craftdeck.status.waiting": "CraftDeck接続を待機中",
+  
+  "craftdeck.config.port": "WebSocketポート",
+  "craftdeck.config.auto_connect": "自動接続",
+  "craftdeck.config.language": "クライアント言語"
+}
