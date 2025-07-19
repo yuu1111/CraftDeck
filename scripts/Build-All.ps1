@@ -1,37 +1,65 @@
-# Build-All.ps1
-# CraftDeck 全体ビルドスクリプト（Minecraft Mod + StreamDeck Plugin）
+#!/usr/bin/env pwsh
+<#
+.SYNOPSIS
+    CraftDeck Complete Build System
 
+.DESCRIPTION
+    Comprehensive build script for CraftDeck project (Minecraft Mod + StreamDeck Plugin).
+    Supports parallel building and component selection.
+
+.PARAMETER Component
+    Component to build: all, mod, or plugin (default: all)
+
+.PARAMETER Configuration
+    Build configuration: Debug or Release (default: Release)
+
+.PARAMETER ModPlatform
+    Mod platform: all, fabric, forge, or quilt (default: all)
+
+.PARAMETER Clean
+    Perform clean build
+
+.PARAMETER Deploy
+    Automatically deploy plugin to StreamDeck
+
+.PARAMETER DetailedLog
+    Show detailed build logs
+
+.PARAMETER NoParallel
+    Disable parallel building
+
+.EXAMPLE
+    .\Build-All.ps1
+    .\Build-All.ps1 -Component mod -ModPlatform fabric
+    .\Build-All.ps1 -Component plugin -Configuration Debug -Deploy
+    .\Build-All.ps1 -Clean -DetailedLog
+
+#>
+
+[CmdletBinding()]
 param(
-    [Parameter(HelpMessage="ビルドするコンポーネント (all, mod, plugin)")]
     [ValidateSet("all", "mod", "plugin")]
     [string]$Component = "all",
 
-    [Parameter(HelpMessage="ビルド構成 (Debug, Release)")]
     [ValidateSet("Debug", "Release")]
     [string]$Configuration = "Release",
 
-    [Parameter(HelpMessage="Modのプラットフォーム (all, fabric, forge, quilt)")]
     [ValidateSet("all", "fabric", "forge", "quilt")]
     [string]$ModPlatform = "all",
 
-    [Parameter(HelpMessage="クリーンビルドを実行")]
     [switch]$Clean,
 
-    [Parameter(HelpMessage="StreamDeckに自動デプロイ")]
     [switch]$Deploy,
 
-    [Parameter(HelpMessage="詳細ログを表示")]
     [switch]$DetailedLog,
 
-    [Parameter(HelpMessage="並列ビルドを無効化")]
     [switch]$NoParallel
 )
 
+# Script configuration
 $ErrorActionPreference = "Stop"
-
-# スクリプトディレクトリ
-$ScriptDir = $PSScriptRoot
-$ProjectRoot = Split-Path -Parent $ScriptDir
+$scriptDir = $PSScriptRoot
+$projectRoot = Split-Path -Parent $scriptDir
 
 Write-Host @"
  ██████╗██████╗  █████╗ ███████╗████████╗██████╗ ███████╗ ██████╗██╗  ██╗
@@ -42,25 +70,35 @@ Write-Host @"
  ╚═════╝╚═╝  ╚═╝╚═╝  ╚═╝╚═╝        ╚═╝   ╚═════╝ ╚══════╝ ╚═════╝╚═╝  ╚═╝
 "@ -ForegroundColor Cyan
 
-Write-Host "`n=== CraftDeck 統合ビルドシステム ===" -ForegroundColor Yellow
-Write-Host "コンポーネント: $Component" -ForegroundColor Gray
-Write-Host "構成: $Configuration" -ForegroundColor Gray
-Write-Host "Modプラットフォーム: $ModPlatform" -ForegroundColor Gray
+Write-Host "`n🔨 CraftDeck Integrated Build System" -ForegroundColor Yellow
+Write-Host "===================================`n" -ForegroundColor Yellow
 
-# ビルド開始時刻
-$StartTime = Get-Date
+Write-Host "Component: $Component" -ForegroundColor Gray
+Write-Host "Configuration: $Configuration" -ForegroundColor Gray
+Write-Host "Mod Platform: $ModPlatform" -ForegroundColor Gray
+if ($Clean) { Write-Host "Clean Build: Yes" -ForegroundColor Gray }
+if ($Deploy) { Write-Host "Auto Deploy: Yes" -ForegroundColor Gray }
+if ($DetailedLog) { Write-Host "Detailed Log: Yes" -ForegroundColor Gray }
+if ($NoParallel) { Write-Host "Parallel Build: No" -ForegroundColor Gray } else { Write-Host "Parallel Build: Yes" -ForegroundColor Gray }
+Write-Host ""
 
-# ビルド結果を格納
-$BuildResults = @{
+# Build results tracking
+$buildResults = @{
     MinecraftMod = $null
     StreamDeckPlugin = $null
 }
 
-# Minecraft Mod ビルド関数
+# Build Minecraft Mod
 function Build-MinecraftMod {
-    Write-Host "`n━━━ Minecraft Mod ビルド ━━━" -ForegroundColor Magenta
+    Write-Host "━━━ 🎮 Minecraft Mod Build ━━━" -ForegroundColor Magenta
 
-    $modScript = Join-Path $ScriptDir "Build-MinecraftMod.ps1"
+    $modScript = Join-Path $scriptDir "Build-Mod.ps1"
+
+    if (-not (Test-Path $modScript)) {
+        $buildResults.MinecraftMod = "❌ Script not found: Build-Mod.ps1"
+        return $false
+    }
+
     $modArgs = @{
         Platform = $ModPlatform
         Clean = $Clean
@@ -68,144 +106,196 @@ function Build-MinecraftMod {
     }
 
     try {
-        & $modScript @modArgs
-        $BuildResults.MinecraftMod = "✅ 成功"
-        return $true
-    }
-    catch {
-        $BuildResults.MinecraftMod = "❌ 失敗: $_"
+        $modParams = @()
+        $modParams += "-Platform", $ModPlatform
+        if ($Clean) { $modParams += "-Clean" }
+        if ($DetailedLog) { $modParams += "-DetailedLog" }
+
+        & $modScript @modParams
+
+        if ($LASTEXITCODE -eq 0) {
+            $buildResults.MinecraftMod = "✅ Success"
+            return $true
+        } else {
+            $buildResults.MinecraftMod = "❌ Failed (exit code: $LASTEXITCODE)"
+            return $false
+        }
+    } catch {
+        $buildResults.MinecraftMod = "❌ Failed: $($_.Exception.Message)"
         return $false
     }
 }
 
-# StreamDeck Plugin ビルド関数
+# Build StreamDeck Plugin
 function Build-StreamDeckPlugin {
-    Write-Host "`n━━━ StreamDeck Plugin ビルド ━━━" -ForegroundColor Magenta
+    Write-Host "━━━ 🎛️ StreamDeck Plugin Build ━━━" -ForegroundColor Magenta
 
-    $pluginScript = Join-Path $ScriptDir "Build-StreamDeckPlugin.ps1"
-    $pluginArgs = @{
-        Configuration = $Configuration
-        Clean = $Clean
-        Deploy = $Deploy
-        DetailedLog = $DetailedLog
+    $pluginScript = Join-Path $scriptDir "Build-Plugin.ps1"
+
+    if (-not (Test-Path $pluginScript)) {
+        $buildResults.StreamDeckPlugin = "❌ Script not found: Build-Plugin.ps1"
+        return $false
     }
 
     try {
-        & $pluginScript @pluginArgs
-        $BuildResults.StreamDeckPlugin = "✅ 成功"
-        return $true
-    }
-    catch {
-        $BuildResults.StreamDeckPlugin = "❌ 失敗: $_"
+        $pluginParams = @()
+        $pluginParams += "-Configuration", $Configuration
+        if ($Clean) { $pluginParams += "-Clean" }
+        if ($Deploy) { $pluginParams += "-Deploy" }
+        if ($DetailedLog) { $pluginParams += "-DetailedLog" }
+
+        & $pluginScript @pluginParams
+
+        if ($LASTEXITCODE -eq 0) {
+            $buildResults.StreamDeckPlugin = "✅ Success"
+            return $true
+        } else {
+            $buildResults.StreamDeckPlugin = "❌ Failed (exit code: $LASTEXITCODE)"
+            return $false
+        }
+    } catch {
+        $buildResults.StreamDeckPlugin = "❌ Failed: $($_.Exception.Message)"
         return $false
     }
 }
 
-# メインビルド処理
-$Success = $true
+# Parallel build execution
+function Start-ParallelBuild {
+    Write-Host "🚀 Starting parallel build..." -ForegroundColor Yellow
 
-try {
-    switch ($Component) {
-        "mod" {
-            $Success = Build-MinecraftMod
-        }
-        "plugin" {
-            $Success = Build-StreamDeckPlugin
-        }
-        "all" {
-            if ($NoParallel) {
-                # 順次実行
-                $modSuccess = Build-MinecraftMod
-                $pluginSuccess = Build-StreamDeckPlugin
-                $Success = $modSuccess -and $pluginSuccess
+    $modJob = Start-Job -ScriptBlock {
+        param($ScriptPath, $ModPlatform, $Clean, $DetailedLog)
+
+        $params = @("-Platform", $ModPlatform)
+        if ($Clean) { $params += "-Clean" }
+        if ($DetailedLog) { $params += "-DetailedLog" }
+
+        & $ScriptPath @params
+        return $LASTEXITCODE
+    } -ArgumentList (Join-Path $scriptDir "Build-Mod.ps1"), $ModPlatform, $Clean, $DetailedLog
+
+    $pluginJob = Start-Job -ScriptBlock {
+        param($ScriptPath, $Configuration, $Clean, $Deploy, $DetailedLog)
+
+        $params = @("-Configuration", $Configuration)
+        if ($Clean) { $params += "-Clean" }
+        if ($Deploy) { $params += "-Deploy" }
+        if ($DetailedLog) { $params += "-DetailedLog" }
+
+        & $ScriptPath @params
+        return $LASTEXITCODE
+    } -ArgumentList (Join-Path $scriptDir "Build-Plugin.ps1"), $Configuration, $Clean, $Deploy, $DetailedLog
+
+    # Wait for completion
+    Write-Host "   Waiting for builds to complete..." -ForegroundColor Gray
+    $jobs = @($modJob, $pluginJob)
+    $completedJobs = $jobs | Wait-Job
+
+    # Process results
+    foreach ($job in $completedJobs) {
+        $result = Receive-Job $job
+        if ($job.Id -eq $modJob.Id) {
+            if ($job.State -eq "Completed" -and $result -eq 0) {
+                $buildResults.MinecraftMod = "✅ Success"
+            } else {
+                $buildResults.MinecraftMod = "❌ Failed"
             }
-            else {
-                # 並列実行
-                Write-Host "`n並列ビルドを開始します..." -ForegroundColor Yellow
-
-                $modJob = Start-Job -ScriptBlock {
-                    param($ScriptDir, $ModPlatform, $Clean, $Verbose)
-                    $modScript = Join-Path $ScriptDir "Build-MinecraftMod.ps1"
-                    & $modScript -Platform $ModPlatform -Clean:$Clean -DetailedLog:$DetailedLog
-                } -ArgumentList $ScriptDir, $ModPlatform, $Clean, $Verbose
-
-                $pluginJob = Start-Job -ScriptBlock {
-                    param($ScriptDir, $Configuration, $Clean, $Deploy, $Verbose)
-                    $pluginScript = Join-Path $ScriptDir "Build-StreamDeckPlugin.ps1"
-                    & $pluginScript -Configuration $Configuration -Clean:$Clean -Deploy:$Deploy -DetailedLog:$DetailedLog
-                } -ArgumentList $ScriptDir, $Configuration, $Clean, $Deploy, $Verbose
-
-                # ジョブの完了を待機
-                $jobs = @($modJob, $pluginJob)
-                $completedJobs = $jobs | Wait-Job
-
-                # 結果の取得
-                foreach ($job in $completedJobs) {
-                    if ($job.Name -eq $modJob.Name) {
-                        if ($job.State -eq "Completed") {
-                            $BuildResults.MinecraftMod = "✅ 成功"
-                        } else {
-                            $BuildResults.MinecraftMod = "❌ 失敗"
-                            $Success = $false
-                        }
-                    }
-                    elseif ($job.Name -eq $pluginJob.Name) {
-                        if ($job.State -eq "Completed") {
-                            $BuildResults.StreamDeckPlugin = "✅ 成功"
-                        } else {
-                            $BuildResults.StreamDeckPlugin = "❌ 失敗"
-                            $Success = $false
-                        }
-                    }
-                }
-
-                # ジョブのクリーンアップ
-                $jobs | Remove-Job -Force
+        } elseif ($job.Id -eq $pluginJob.Id) {
+            if ($job.State -eq "Completed" -and $result -eq 0) {
+                $buildResults.StreamDeckPlugin = "✅ Success"
+            } else {
+                $buildResults.StreamDeckPlugin = "❌ Failed"
             }
         }
     }
-}
-catch {
-    Write-Error "ビルド中にエラーが発生しました: $_"
-    $Success = $false
-}
 
-# ビルド結果サマリー
-$EndTime = Get-Date
-$Duration = $EndTime - $StartTime
+    # Cleanup
+    $jobs | Remove-Job -Force
 
-Write-Host "`n━━━ ビルド結果サマリー ━━━" -ForegroundColor Cyan
-Write-Host "総実行時間: $($Duration.ToString('mm\:ss'))" -ForegroundColor Gray
-
-if ($Component -eq "all" -or $Component -eq "mod") {
-    Write-Host "Minecraft Mod: $($BuildResults.MinecraftMod)" -ForegroundColor White
+    $success = ($buildResults.MinecraftMod -like "*Success*") -and ($buildResults.StreamDeckPlugin -like "*Success*")
+    return $success
 }
 
-if ($Component -eq "all" -or $Component -eq "plugin") {
-    Write-Host "StreamDeck Plugin: $($BuildResults.StreamDeckPlugin)" -ForegroundColor White
-}
-
-if ($Success) {
-    Write-Host "`n🎉 すべてのビルドが正常に完了しました！" -ForegroundColor Green
-
-    # 成果物の場所を表示
-    Write-Host "`n📦 ビルド成果物の場所:" -ForegroundColor Yellow
+# Show build artifacts
+function Show-BuildArtifacts {
+    Write-Host "📦 Build Artifacts:" -ForegroundColor Yellow
 
     if ($Component -eq "all" -or $Component -eq "mod") {
-        Write-Host "  Minecraft Mod:" -ForegroundColor Gray
-        Write-Host "    - Fabric: $ProjectRoot\craftdeck-mod\fabric\build\libs\" -ForegroundColor DarkGray
-        Write-Host "    - Forge: $ProjectRoot\craftdeck-mod\forge\build\libs\" -ForegroundColor DarkGray
-        Write-Host "    - Quilt: $ProjectRoot\craftdeck-mod\quilt\build\libs\" -ForegroundColor DarkGray
+        Write-Host "   Minecraft Mod:" -ForegroundColor Gray
+        $platforms = if ($ModPlatform -eq "all") { @("fabric", "forge", "quilt") } else { @($ModPlatform) }
+
+        foreach ($platform in $platforms) {
+            $libsDir = Join-Path $projectRoot "craftdeck-mod\$platform\build\libs"
+            if (Test-Path $libsDir) {
+                Write-Host "     - $platform`: $libsDir" -ForegroundColor DarkGray
+            }
+        }
     }
 
     if ($Component -eq "all" -or $Component -eq "plugin") {
-        Write-Host "  StreamDeck Plugin:" -ForegroundColor Gray
-        Write-Host "    - 実行ファイル: $ProjectRoot\craftdeck-plugin\bin\$Configuration\net6.0-windows\" -ForegroundColor DarkGray
+        Write-Host "   StreamDeck Plugin:" -ForegroundColor Gray
+        $pluginBin = Join-Path $projectRoot "craftdeck-plugin\bin\$Configuration\net6.0"
+        if (Test-Path $pluginBin) {
+            Write-Host "     - Plugin: $pluginBin" -ForegroundColor DarkGray
+        }
+    }
+}
+
+# Main execution
+function Main {
+    $startTime = Get-Date
+    $success = $true
+
+    try {
+        switch ($Component) {
+            "mod" {
+                $success = Build-MinecraftMod
+            }
+            "plugin" {
+                $success = Build-StreamDeckPlugin
+            }
+            "all" {
+                if ($NoParallel) {
+                    # Sequential execution
+                    Write-Host "🔄 Sequential build mode" -ForegroundColor Yellow
+                    $modSuccess = Build-MinecraftMod
+                    $pluginSuccess = Build-StreamDeckPlugin
+                    $success = $modSuccess -and $pluginSuccess
+                } else {
+                    # Parallel execution
+                    $success = Start-ParallelBuild
+                }
+            }
+        }
+    } catch {
+        Write-Host "❌ Build system error: $($_.Exception.Message)" -ForegroundColor Red
+        $success = $false
     }
 
-    exit 0
+    # Build results summary
+    $endTime = Get-Date
+    $duration = $endTime - $startTime
+
+    Write-Host "`n━━━ 📊 Build Results Summary ━━━" -ForegroundColor Cyan
+    Write-Host "Total build time: $($duration.ToString('mm\:ss'))" -ForegroundColor Gray
+
+    if ($Component -eq "all" -or $Component -eq "mod") {
+        Write-Host "Minecraft Mod: $($buildResults.MinecraftMod)" -ForegroundColor White
+    }
+
+    if ($Component -eq "all" -or $Component -eq "plugin") {
+        Write-Host "StreamDeck Plugin: $($buildResults.StreamDeckPlugin)" -ForegroundColor White
+    }
+
+    if ($success) {
+        Write-Host "`n🎉 All builds completed successfully!" -ForegroundColor Green
+        Show-BuildArtifacts
+        exit 0
+    } else {
+        Write-Host "`n💥 Build failed!" -ForegroundColor Red
+        exit 1
+    }
 }
-else {
-    Write-Host "`n❌ ビルドに失敗しました" -ForegroundColor Red
-    exit 1
-}
+
+# Execute main function
+Main
